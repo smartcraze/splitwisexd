@@ -7,75 +7,111 @@ datasource db {
   provider = "postgresql"
 }
 
-
-enum CampaignStatus {
-  DRAFT
-  RUNNING
-  COMPLETED
-  FAILED
+enum SplitMethod {
+  EQUAL
+  UNEQUAL
+  PERCENTAGE
+  SHARES
 }
 
-enum MessageStatus {
+enum SettlementStatus {
   PENDING
-  SENT
-  DELIVERED
-  READ
-  CLICKED
-  FAILED
+  COMPLETED
 }
 
-model Customer {
-  id            String   @id @default(cuid())
-  name          String
-  email         String   @unique
-  phone         String   @unique
-  city          String
-  totalSpent    Float    @default(0)
-  createdAt     DateTime @default(now())
-
-  orders        Order[]
-  communications Communication[]
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  avatarUrl    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdGroups Group[] @relation("GroupCreator")
+  memberships GroupMember[]
+  paidExpenses Expense[] @relation("ExpensePaidBy")
+  createdExpenses Expense[] @relation("ExpenseCreatedBy")
+  expenseParticipants ExpenseParticipant[]
+  comments ExpenseComment[]
+  settlementsPaid Settlement[] @relation("SettlementPaidBy")
+  settlementsReceived Settlement[] @relation("SettlementPaidTo")
 }
 
-model Order {
-  id          String   @id @default(cuid())
-  amount      Float
-  category    String
-  createdAt   DateTime @default(now())
-
-  customerId  String
-  customer    Customer @relation(fields: [customerId], references: [id])
-}
-
-model Campaign {
-  id          String           @id @default(cuid())
+model Group {
+  id          String  @id @default(cuid())
   name        String
-  message     String
-  channel     String
-  audienceQuery String?
-
-  status      CampaignStatus @default(DRAFT)
-
-  createdAt   DateTime @default(now())
-
-  communications Communication[]
+  description String?
+  createdById String
+  createdBy   User @relation("GroupCreator", fields: [createdById], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  members GroupMember[]
+  expenses Expense[]
+  settlements Settlement[]
 }
 
-model Communication {
-  id            String        @id @default(cuid())
+model GroupMember {
+  id String @id @default(cuid())
+  groupId String
+  userId  String
+  role String @default("MEMBER")
+  joinedAt DateTime @default(now())
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([groupId, userId])
+}
 
-  campaignId    String
-  campaign      Campaign     @relation(fields: [campaignId], references: [id])
+model Expense {
+  id String @id @default(cuid())
+  title       String
+  description String?
+  totalAmount Int
+  splitMethod SplitMethod
+  groupId String
+  group   Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  paidByUserId String
+  paidBy       User @relation("ExpensePaidBy", fields: [paidByUserId], references: [id])
+  createdById String
+  createdBy   User @relation("ExpenseCreatedBy", fields: [createdById], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  participants ExpenseParticipant[]
+  comments ExpenseComment[]
+}
 
-  customerId    String
-  customer      Customer     @relation(fields: [customerId], references: [id])
+model ExpenseParticipant {
+  id String @id @default(cuid())
+  expenseId String
+  expense   Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  owedAmount Int
+  percentage Float?
+  shares Int?
+  createdAt DateTime @default(now())
+  @@unique([expenseId, userId])
+}
 
-  status        MessageStatus @default(PENDING)
+model Settlement {
+  id String @id @default(cuid())
+  groupId String
+  group   Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  paidByUserId String
+  paidBy       User @relation("SettlementPaidBy", fields: [paidByUserId], references: [id])
+  paidToUserId String
+  paidTo       User @relation("SettlementPaidTo", fields: [paidToUserId], references: [id])
+  amount Int
+  note String?
+  status SettlementStatus @default(COMPLETED)
+  createdAt DateTime @default(now())
+}
 
-  sentAt        DateTime?
-  deliveredAt   DateTime?
-  readAt        DateTime?
-  clickedAt     DateTime?
-
-  createdAt     DateTime @default(now())
+model ExpenseComment {
+  id String @id @default(cuid())
+  expenseId String
+  expense   Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message String
+  createdAt DateTime @default(now())
 }
