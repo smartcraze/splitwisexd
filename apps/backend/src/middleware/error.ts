@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { ApiResponse } from "../lib/api-response.ts";
 import { AppError } from "../lib/app-error.ts";
+import { env } from "../lib/env.ts";
 
 export const errorHandler = (
   // biome-ignore lint/suspicious/noExplicitAny: error object type is arbitrary at runtime
@@ -15,14 +16,18 @@ export const errorHandler = (
   if (err instanceof AppError) {
     statusCode = err.statusCode;
     message = err.message;
-  } else if (err instanceof Error) {
-    message = err.message;
-  }
-
-  // Prisma unique constraint violation
-  if (err.code === "P2002") {
+  } else if (err.code === "P2002") {
     statusCode = 409;
     message = "A record with this value already exists.";
+  } else {
+    // For unhandled non-operational errors, hide details in production
+    statusCode = 500;
+    message =
+      env.NODE_ENV === "production"
+        ? "Internal Server Error"
+        : err instanceof Error
+          ? err.message
+          : "Internal Server Error";
   }
 
   console.error("Unhandled Error:", err);

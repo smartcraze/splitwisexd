@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { env } from "../lib/env.ts";
 
-const JWT_SECRET =
-  process.env.JWT_SECRET || "super-secret-key-splitwise-xd-2026";
+const JWT_SECRET = env.JWT_SECRET;
 
 export interface AuthRequest extends Request {
   user?: {

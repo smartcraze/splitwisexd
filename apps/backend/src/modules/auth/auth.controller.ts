@@ -4,13 +4,13 @@ import jwt from "jsonwebtoken";
 import { ApiResponse } from "../../lib/api-response.ts";
 import { AppError } from "../../lib/app-error.ts";
 import { asyncHandler } from "../../lib/async-handler.ts";
+import { JWT_EXPIRES_IN } from "../../lib/constant.ts";
+import { env } from "../../lib/env.ts";
 import type { AuthRequest } from "../../middleware/auth.ts";
 import { AuthRepository } from "./auth.repository.ts";
 import { loginSchema, registerSchema } from "./auth.schemas.ts";
 
-const JWT_SECRET =
-  process.env.JWT_SECRET || "super-secret-key-splitwise-xd-2026";
-const JWT_EXPIRES_IN = "7d";
+const JWT_SECRET = env.JWT_SECRET;
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const parsed = registerSchema.safeParse(req.body);

@@ -182,6 +182,14 @@ export const removeMember = asyncHandler(
       );
     }
 
+    const requesterId = authReq.user.id;
+    if (requesterId !== targetUserId && membership.role !== "ADMIN") {
+      throw new AppError(
+        "Access denied. Only group admins can remove other members.",
+        403,
+      );
+    }
+
     const targetMember = await GroupsRepository.findMembership(
       groupId,
       targetUserId,
