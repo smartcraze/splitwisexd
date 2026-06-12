@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+enum CampaignStatus {
+  DRAFT
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum MessageStatus {
+  PENDING
+  SENT
+  DELIVERED
+  READ
+  CLICKED
+  FAILED
+}
+
+model Customer {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  phone         String   @unique
+  city          String
+  totalSpent    Float    @default(0)
+  createdAt     DateTime @default(now())
+
+  orders        Order[]
+  communications Communication[]
+}
+
+model Order {
+  id          String   @id @default(cuid())
+  amount      Float
+  category    String
+  createdAt   DateTime @default(now())
+
+  customerId  String
+  customer    Customer @relation(fields: [customerId], references: [id])
+}
+
+model Campaign {
+  id          String           @id @default(cuid())
+  name        String
+  message     String
+  channel     String
+  audienceQuery String?
+
+  status      CampaignStatus @default(DRAFT)
+
+  createdAt   DateTime @default(now())
+
+  communications Communication[]
+}
+
+model Communication {
+  id            String        @id @default(cuid())
+
+  campaignId    String
+  campaign      Campaign     @relation(fields: [campaignId], references: [id])
+
+  customerId    String
+  customer      Customer     @relation(fields: [customerId], references: [id])
+
+  status        MessageStatus @default(PENDING)
+
+  sentAt        DateTime?
+  deliveredAt   DateTime?
+  readAt        DateTime?
+  clickedAt     DateTime?
+
+  createdAt     DateTime @default(now())
+}
