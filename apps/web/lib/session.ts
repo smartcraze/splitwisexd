@@ -1,5 +1,5 @@
-import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 
 export async function getSessionUser() {
   const cookieStore = await cookies();

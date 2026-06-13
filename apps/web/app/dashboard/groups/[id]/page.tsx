@@ -1,11 +1,15 @@
-import React, { Suspense } from "react";
-import { notFound, redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/session";
-import { getCachedExpenses, getCachedSettlements, getGroupBalances } from "@/lib/queries";
-import { AppLayout } from "@/components/features/layout/app-layout";
-import { GroupPageContent } from "@/components/features/groups/group-page-content";
-import { GroupDetailSkeleton } from "@/components/features/groups/group-detail-skeleton";
 import { prisma } from "@repo/db";
+import { notFound, redirect } from "next/navigation";
+import React, { Suspense } from "react";
+import { GroupDetailSkeleton } from "@/components/features/groups/group-detail-skeleton";
+import { GroupPageContent } from "@/components/features/groups/group-page-content";
+import { AppLayout } from "@/components/features/layout/app-layout";
+import {
+  getCachedExpenses,
+  getCachedSettlements,
+  getGroupBalances,
+} from "@/lib/queries";
+import { getSessionUser } from "@/lib/session";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -47,7 +51,9 @@ async function GroupPageDynamic({ params }: Props) {
       include: {
         members: {
           include: {
-            user: { select: { id: true, name: true, email: true, avatarUrl: true } },
+            user: {
+              select: { id: true, name: true, email: true, avatarUrl: true },
+            },
           },
         },
       },

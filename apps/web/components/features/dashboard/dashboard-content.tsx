@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
 import { useRouter } from "next/navigation";
+import React from "react";
 import { GroupsList } from "@/components/features/dashboard/groups-list";
 import { RecentActivity } from "@/components/features/dashboard/recent-activity";
 import { SettleUpPanel } from "@/components/features/dashboard/settle-up-panel";

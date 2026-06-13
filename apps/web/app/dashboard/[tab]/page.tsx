@@ -1,19 +1,20 @@
-import React, { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/session";
+import type React from "react";
+import { Suspense } from "react";
+import { DashboardSkeleton } from "@/components/features/dashboard/dashboard-skeleton";
+import { ExpensesView } from "@/components/features/expenses/expenses-view";
+import { FriendsView } from "@/components/features/friends/friends-view";
+import { GroupsView } from "@/components/features/groups/groups-view";
+import { AppLayout } from "@/components/features/layout/app-layout";
+import { NotificationsView } from "@/components/features/notifications/notifications-view";
+import { SettlementsView } from "@/components/features/settlements/settlements-view";
 import {
-  getCachedGroups,
   getCachedExpenses,
+  getCachedGroups,
   getCachedSettlements,
   getGroupBalances,
 } from "@/lib/queries";
-import { AppLayout } from "@/components/features/layout/app-layout";
-import { GroupsView } from "@/components/features/groups/groups-view";
-import { ExpensesView } from "@/components/features/expenses/expenses-view";
-import { SettlementsView } from "@/components/features/settlements/settlements-view";
-import { FriendsView } from "@/components/features/friends/friends-view";
-import { NotificationsView } from "@/components/features/notifications/notifications-view";
-import { DashboardSkeleton } from "@/components/features/dashboard/dashboard-skeleton";
+import { getSessionUser } from "@/lib/session";
 
 type Props = { params: Promise<{ tab: string }> };
 
@@ -119,7 +120,7 @@ async function DashboardTabDispatcherDynamic({ params }: Props) {
       );
 
       const friends = Array.from(friendMap.values()).sort(
-        (a, b) => (b.owesYou + b.youOwe) - (a.owesYou + a.youOwe),
+        (a, b) => b.owesYou + b.youOwe - (a.owesYou + a.youOwe),
       );
       content = <FriendsView initialFriends={friends} />;
       break;

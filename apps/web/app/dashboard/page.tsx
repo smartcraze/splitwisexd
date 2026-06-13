@@ -1,11 +1,15 @@
-import React, { Suspense } from "react";
+import { prisma } from "@repo/db";
 import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/session";
-import { getCachedGroups, getCachedUserSummary, getGroupBalances } from "@/lib/queries";
-import { AppLayout } from "@/components/features/layout/app-layout";
+import React, { Suspense } from "react";
 import { DashboardContent } from "@/components/features/dashboard/dashboard-content";
 import { DashboardSkeleton } from "@/components/features/dashboard/dashboard-skeleton";
-import { prisma } from "@repo/db";
+import { AppLayout } from "@/components/features/layout/app-layout";
+import {
+  getCachedGroups,
+  getCachedUserSummary,
+  getGroupBalances,
+} from "@/lib/queries";
+import { getSessionUser } from "@/lib/session";
 
 export default function DashboardPage() {
   return (
@@ -78,8 +82,7 @@ async function DashboardPageContentDynamic() {
 
   // Sort activities by date
   activities.sort(
-    (a, b) =>
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
   const recentActivities = activities.slice(0, 5);
 

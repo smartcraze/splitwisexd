@@ -2,7 +2,13 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import type React from "react";
-import { createContext, useContext, useEffect, useState, Suspense } from "react";
+import {
+  createContext,
+  Suspense,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { api } from "@/lib/api";
 
 interface User {
@@ -32,7 +38,13 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
-function AuthRedirectGuard({ user, loading }: { user: User | null; loading: boolean }) {
+function AuthRedirectGuard({
+  user,
+  loading,
+}: {
+  user: User | null;
+  loading: boolean;
+}) {
   const pathname = usePathname();
   const router = useRouter();
 
