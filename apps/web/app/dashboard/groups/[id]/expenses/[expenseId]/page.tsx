@@ -1,19 +1,13 @@
 "use client";
 
-import {
-  ArrowLeft,
-  Calendar,
-  Info,
-  Loader2,
-  Receipt,
-  User,
-} from "lucide-react";
+import { ArrowLeft, Calendar, Info, Receipt, User } from "lucide-react";
 import Link from "next/link";
 import React, { use, useEffect, useState } from "react";
 import { useAuth } from "@/components/features/auth/auth-context";
 import { CommentsSection } from "@/components/features/comments/comments-section";
 import { AppLayout } from "@/components/features/layout/app-layout";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/api";
 
 type Props = { params: Promise<{ id: string; expenseId: string }> };
@@ -42,9 +36,18 @@ export default function ExpensePage(props: Props) {
 
   if (loading || !user) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
+      <AppLayout>
+        <div className="max-w-3xl mx-auto space-y-6">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-9 w-9 rounded-lg" />
+            <Skeleton className="h-4 w-40" />
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 items-start">
+            <Skeleton className="h-[400px] w-full rounded-2xl" />
+            <Skeleton className="h-[400px] w-full rounded-2xl" />
+          </div>
+        </div>
+      </AppLayout>
     );
   }
 
@@ -54,7 +57,10 @@ export default function ExpensePage(props: Props) {
         <div className="flex items-center justify-center py-20 text-center">
           <div>
             <h2 className="text-xl font-bold">Expense not found</h2>
-            <Link href={`/groups/${groupId}`} className="text-primary hover:underline mt-2 block">
+            <Link
+              href={`/dashboard/groups/${groupId}`}
+              className="text-primary hover:underline mt-2 block"
+            >
               Back to Group
             </Link>
           </div>
@@ -71,7 +77,7 @@ export default function ExpensePage(props: Props) {
     <AppLayout>
       <div className="max-w-3xl mx-auto space-y-6">
         <div className="flex items-center gap-2 pb-2">
-          <Link href={`/groups/${groupId}`}>
+          <Link href={`/dashboard/groups/${groupId}`}>
             <Button
               variant="ghost"
               size="icon"
@@ -138,17 +144,26 @@ export default function ExpensePage(props: Props) {
               </h3>
               <div className="divide-y divide-border/40 text-xs">
                 {expense.participants.map((p: any) => (
-                  <div key={p.id} className="flex justify-between py-2 text-muted-foreground">
-                    <span className="font-medium text-foreground">{p.user.name}</span>
+                  <div
+                    key={p.id}
+                    className="flex justify-between py-2 text-muted-foreground"
+                  >
+                    <span className="font-medium text-foreground">
+                      {p.user.name}
+                    </span>
                     <div className="text-right">
                       <span className="font-semibold text-foreground">
                         {formatCurrency(p.owedAmount)}
                       </span>
                       {expense.splitMethod === "PERCENTAGE" && p.percentage && (
-                        <span className="text-[10px] block opacity-75">{p.percentage}%</span>
+                        <span className="text-[10px] block opacity-75">
+                          {p.percentage}%
+                        </span>
                       )}
                       {expense.splitMethod === "SHARES" && p.shares && (
-                        <span className="text-[10px] block opacity-75">{p.shares} shares</span>
+                        <span className="text-[10px] block opacity-75">
+                          {p.shares} shares
+                        </span>
                       )}
                     </div>
                   </div>

@@ -26,7 +26,8 @@ export function RegisterForm() {
   const hasUppercase = /[A-Z]/.test(password);
   const hasNumber = /[0-9]/.test(password);
   const hasSpecial = /[^a-zA-Z0-9]/.test(password);
-  const isPasswordValid = hasMinLength && hasLowercase && hasUppercase && hasNumber && hasSpecial;
+  const isPasswordValid =
+    hasMinLength && hasLowercase && hasUppercase && hasNumber && hasSpecial;
 
   const isFormValid = isNameValid && isEmailValid && isPasswordValid;
 
@@ -84,11 +85,15 @@ export function RegisterForm() {
             required
             disabled={loading}
             className={`w-full bg-background border-border text-foreground focus:ring-ring focus:border-primary ${
-              !isNameValid && name !== "" ? "border-destructive focus:border-destructive focus:ring-destructive" : ""
+              !isNameValid && name !== ""
+                ? "border-destructive focus:border-destructive focus:ring-destructive"
+                : ""
             }`}
           />
           {!isNameValid && name !== "" && (
-            <p className="text-[10px] text-destructive font-medium">Name must be at least 2 characters long</p>
+            <p className="text-[10px] text-destructive font-medium">
+              Name must be at least 2 characters long
+            </p>
           )}
         </div>
 
@@ -103,11 +108,15 @@ export function RegisterForm() {
             required
             disabled={loading}
             className={`w-full bg-background border-border text-foreground focus:ring-ring focus:border-primary ${
-              !isEmailValid && email !== "" ? "border-destructive focus:border-destructive focus:ring-destructive" : ""
+              !isEmailValid && email !== ""
+                ? "border-destructive focus:border-destructive focus:ring-destructive"
+                : ""
             }`}
           />
           {!isEmailValid && email !== "" && (
-            <p className="text-[10px] text-destructive font-medium">Please enter a valid email address</p>
+            <p className="text-[10px] text-destructive font-medium">
+              Please enter a valid email address
+            </p>
           )}
         </div>
 
@@ -122,15 +131,28 @@ export function RegisterForm() {
             required
             disabled={loading}
             className={`w-full bg-background border-border text-foreground focus:ring-ring focus:border-primary ${
-              !isPasswordValid && password !== "" ? "border-destructive focus:border-destructive focus:ring-destructive" : ""
+              !isPasswordValid && password !== ""
+                ? "border-destructive focus:border-destructive focus:ring-destructive"
+                : ""
             }`}
           />
           {password !== "" && (
             <div className="grid grid-cols-2 gap-1.5 pt-1.5">
               {requirements.map((req) => (
-                <div key={req.label} className="flex items-center gap-1.5 text-[10px] font-semibold transition-all">
-                  <span className={`h-1.5 w-1.5 rounded-full ${req.met ? "bg-emerald-500" : "bg-muted-foreground/30"}`} />
-                  <span className={req.met ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}>
+                <div
+                  key={req.label}
+                  className="flex items-center gap-1.5 text-[10px] font-semibold transition-all"
+                >
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${req.met ? "bg-emerald-500" : "bg-muted-foreground/30"}`}
+                  />
+                  <span
+                    className={
+                      req.met
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-muted-foreground"
+                    }
+                  >
                     {req.label}
                   </span>
                 </div>
@@ -147,7 +169,6 @@ export function RegisterForm() {
           {loading ? "Registering..." : "Sign Up"}
         </Button>
       </form>
-
 
       <div className="mt-6 text-center text-sm text-muted-foreground">
         Already have an account?{" "}

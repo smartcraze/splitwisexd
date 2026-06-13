@@ -82,7 +82,7 @@ export function ExpenseList({
             className="flex items-center justify-between p-4 bg-card rounded-xl border border-border hover:shadow-sm transition-all"
           >
             <Link
-              href={`/groups/${groupId}/expenses/${expense.id}`}
+              href={`/dashboard/groups/${groupId}/expenses/${expense.id}`}
               className="flex-1 min-w-0"
             >
               <div className="font-bold truncate text-foreground hover:text-primary transition-colors">
@@ -107,7 +107,9 @@ export function ExpenseList({
               </div>
 
               <div className="flex items-center gap-1">
-                <Link href={`/groups/${groupId}/expenses/${expense.id}`}>
+                <Link
+                  href={`/dashboard/groups/${groupId}/expenses/${expense.id}`}
+                >
                   <Button
                     size="icon"
                     variant="ghost"
@@ -144,4 +146,3 @@ export function ExpenseList({
     </div>
   );
 }
-

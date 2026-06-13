@@ -23,12 +23,46 @@ interface GroupsListProps {
 
 // Map group name keywords to images from /public
 const GROUP_IMAGE_MAP: { keywords: string[]; src: string }[] = [
-  { keywords: ["food", "eat", "lunch", "dinner", "restaurant", "cafe", "pizza", "snack"], src: "/food-1.png" },
-  { keywords: ["trip", "travel", "tour", "vacation", "goa", "ladakh", "trek", "hike", "mountain", "beach"], src: "/travel-1.png" },
-  { keywords: ["flat", "house", "room", "home", "rent", "flatmate"], src: "/food-2.png" },
+  {
+    keywords: [
+      "food",
+      "eat",
+      "lunch",
+      "dinner",
+      "restaurant",
+      "cafe",
+      "pizza",
+      "snack",
+    ],
+    src: "/food-1.png",
+  },
+  {
+    keywords: [
+      "trip",
+      "travel",
+      "tour",
+      "vacation",
+      "goa",
+      "ladakh",
+      "trek",
+      "hike",
+      "mountain",
+      "beach",
+    ],
+    src: "/travel-1.png",
+  },
+  {
+    keywords: ["flat", "house", "room", "home", "rent", "flatmate"],
+    src: "/food-2.png",
+  },
 ];
 
-const FALLBACK_IMAGES = ["/travel-1.png", "/food-1.png", "/travel-2.png", "/food-2.png"];
+const FALLBACK_IMAGES = [
+  "/travel-1.png",
+  "/food-1.png",
+  "/travel-2.png",
+  "/food-2.png",
+];
 
 function getGroupImage(name: string, index: number): string {
   const lower = name.toLowerCase();
@@ -50,7 +84,8 @@ export function GroupsList({ groups, onGroupCreated }: GroupsListProps) {
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {groups.map((group, index) => {
         const imgSrc = getGroupImage(group.name, index);
-        const balanceStr = group._balance !== undefined ? formatCurrency(group._balance) : null;
+        const balanceStr =
+          group._balance !== undefined ? formatCurrency(group._balance) : null;
         const isPositive = (group._balance ?? 0) >= 0;
 
         return (
@@ -59,7 +94,10 @@ export function GroupsList({ groups, onGroupCreated }: GroupsListProps) {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.06 }}
-            whileHover={{ y: -3, transition: { type: "spring", stiffness: 400, damping: 28 } }}
+            whileHover={{
+              y: -3,
+              transition: { type: "spring", stiffness: 400, damping: 28 },
+            }}
             className="group rounded-2xl border border-border bg-card shadow-sm hover:shadow-md transition-all overflow-hidden"
           >
             {/* Image */}
@@ -68,6 +106,8 @@ export function GroupsList({ groups, onGroupCreated }: GroupsListProps) {
                 src={imgSrc}
                 alt={group.name}
                 fill
+                loading={index === 0 ? "eager" : "lazy"}
+                priority={index === 0}
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
                 sizes="(max-width: 768px) 100vw, 33vw"
               />
@@ -88,10 +128,14 @@ export function GroupsList({ groups, onGroupCreated }: GroupsListProps) {
 
               {balanceStr && (
                 <div className="mt-2">
-                  <span className={`text-sm font-bold ${isPositive ? "text-emerald-600" : "text-rose-600"}`}>
+                  <span
+                    className={`text-sm font-bold ${isPositive ? "text-emerald-600" : "text-rose-600"}`}
+                  >
                     {balanceStr}
                   </span>
-                  <span className={`text-xs ml-1 ${isPositive ? "text-emerald-500" : "text-rose-500"}`}>
+                  <span
+                    className={`text-xs ml-1 ${isPositive ? "text-emerald-500" : "text-rose-500"}`}
+                  >
                     {isPositive ? "You are owed" : "You owe"}
                   </span>
                 </div>
@@ -107,7 +151,7 @@ export function GroupsList({ groups, onGroupCreated }: GroupsListProps) {
                   })}
                 </span>
                 <Link
-                  href={`/groups/${group.id}`}
+                  href={`/dashboard/groups/${group.id}`}
                   className="flex items-center gap-0.5 font-semibold text-primary hover:underline"
                 >
                   View <ChevronRight className="h-3.5 w-3.5" />
@@ -129,7 +173,9 @@ export function GroupsList({ groups, onGroupCreated }: GroupsListProps) {
           <Plus className="h-6 w-6 text-primary" />
         </div>
         <div>
-          <p className="font-semibold text-sm text-foreground">Create a new group</p>
+          <p className="font-semibold text-sm text-foreground">
+            Create a new group
+          </p>
           <p className="text-xs text-muted-foreground mt-1">
             Start tracking expenses with friends and family.
           </p>

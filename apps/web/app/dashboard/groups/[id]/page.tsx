@@ -1,6 +1,5 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
 import React, { use, useEffect, useState } from "react";
 import { useAuth } from "@/components/features/auth/auth-context";
 import { AppLayout } from "@/components/features/layout/app-layout";
@@ -15,6 +14,7 @@ import { SettlementsList } from "@/components/features/settlements/settlements-l
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
 import { useSocket } from "@/lib/socket";
+import { GroupDetailSkeleton } from "@/components/features/groups/group-detail-skeleton";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -72,7 +72,11 @@ export default function GroupPage(props: Props) {
   }, [socket, groupId]);
 
   const handleSettleQuick = (fromId: string, toId: string, amount: number) => {
-    setPrefillSettle(fromId === user?.id ? { paidToUserId: toId, amount } : { paidToUserId: fromId, amount });
+    setPrefillSettle(
+      fromId === user?.id
+        ? { paidToUserId: toId, amount }
+        : { paidToUserId: fromId, amount },
+    );
     setSettleOpen(true);
   };
 
@@ -85,9 +89,9 @@ export default function GroupPage(props: Props) {
 
   if (loading || !user) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
+      <AppLayout>
+        <GroupDetailSkeleton />
+      </AppLayout>
     );
   }
 
@@ -97,8 +101,14 @@ export default function GroupPage(props: Props) {
         <GroupHeader
           name={group.name}
           description={group.description}
-          onAddExpense={() => { setEditExpense(null); setExpenseOpen(true); }}
-          onSettleUp={() => { setPrefillSettle(null); setSettleOpen(true); }}
+          onAddExpense={() => {
+            setEditExpense(null);
+            setExpenseOpen(true);
+          }}
+          onSettleUp={() => {
+            setPrefillSettle(null);
+            setSettleOpen(true);
+          }}
           onAddMember={() => setMemberOpen(true)}
         />
 
@@ -116,11 +126,15 @@ export default function GroupPage(props: Props) {
                   expenses={expenses}
                   currentUserId={user.id}
                   groupCreatorId={group.createdById}
-                  onEdit={(e) => { setEditExpense(e); setExpenseOpen(true); }}
+                  onEdit={(e) => {
+                    setEditExpense(e);
+                    setExpenseOpen(true);
+                  }}
                   onDelete={handleDeleteExpense}
                 />
               </TabsContent>
               <TabsContent value="settlements">
+                <TabsTrigger value="settlements" className="hidden" />
                 <SettlementsList settlements={settlements} />
               </TabsContent>
             </Tabs>

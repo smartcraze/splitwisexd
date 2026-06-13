@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!user && !isAuthPage) {
         router.replace("/login");
       } else if (user && isAuthPage) {
-        router.replace("/");
+        router.replace("/dashboard");
       }
     }
   }, [user, loading, pathname, router]);
@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("token", data.token);
     setToken(data.token);
     setUser(data.user);
-    router.replace("/");
+    router.replace("/dashboard");
   };
 
   const register = async (name: string, email: string, password: string) => {
@@ -84,7 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("token", data.token);
     setToken(data.token);
     setUser(data.user);
-    router.replace("/");
+    router.replace("/dashboard");
   };
 
   const logout = () => {

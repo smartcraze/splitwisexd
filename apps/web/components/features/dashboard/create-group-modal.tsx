@@ -18,7 +18,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
 
-export function CreateGroupModal({ onGroupCreated }: { onGroupCreated?: () => void }) {
+export function CreateGroupModal({
+  onGroupCreated,
+}: {
+  onGroupCreated?: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -67,17 +71,34 @@ export function CreateGroupModal({ onGroupCreated }: { onGroupCreated?: () => vo
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create Group</DialogTitle>
-          <DialogDescription>Create a new shared space for tracking and splitting expenses.</DialogDescription>
+          <DialogDescription>
+            Create a new shared space for tracking and splitting expenses.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          {error && <div className="text-xs bg-destructive/10 text-destructive p-3 rounded">{error}</div>}
+          {error && (
+            <div className="text-xs bg-destructive/10 text-destructive p-3 rounded">
+              {error}
+            </div>
+          )}
           <div className="space-y-1">
             <Label htmlFor="group-name">Group Name</Label>
-            <Input id="group-name" value={name} onChange={(e) => setName(e.target.value)} required placeholder="Trip to Ladakh, Flat 304, etc." />
+            <Input
+              id="group-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              placeholder="Trip to Ladakh, Flat 304, etc."
+            />
           </div>
           <div className="space-y-1">
             <Label htmlFor="desc">Description</Label>
-            <Textarea id="desc" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Add a short description (optional)" />
+            <Textarea
+              id="desc"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Add a short description (optional)"
+            />
           </div>
           <div className="space-y-2">
             <Label>Invite Members (by Email)</Label>
@@ -94,15 +115,27 @@ export function CreateGroupModal({ onGroupCreated }: { onGroupCreated?: () => vo
                   }
                 }}
               />
-              <Button type="button" size="icon" onClick={addEmail} className="bg-secondary text-secondary-foreground hover:bg-secondary/80">
+              <Button
+                type="button"
+                size="icon"
+                onClick={addEmail}
+                className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
+              >
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
             <div className="flex flex-wrap gap-1.5 mt-2 max-h-24 overflow-y-auto">
               {memberEmails.map((email, idx) => (
-                <div key={email} className="flex items-center gap-1 text-xs bg-muted text-muted-foreground px-2.5 py-1 rounded-full border border-border">
+                <div
+                  key={email}
+                  className="flex items-center gap-1 text-xs bg-muted text-muted-foreground px-2.5 py-1 rounded-full border border-border"
+                >
                   <span>{email}</span>
-                  <button type="button" onClick={() => removeEmail(idx)} className="hover:text-destructive">
+                  <button
+                    type="button"
+                    onClick={() => removeEmail(idx)}
+                    className="hover:text-destructive"
+                  >
                     <X className="h-3 w-3" />
                   </button>
                 </div>
@@ -110,7 +143,11 @@ export function CreateGroupModal({ onGroupCreated }: { onGroupCreated?: () => vo
             </div>
           </div>
           <DialogFooter className="pt-4">
-            <Button type="submit" disabled={loading} className="w-full sm:w-auto bg-primary text-primary-foreground font-semibold hover:bg-primary/90">
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full sm:w-auto bg-primary text-primary-foreground font-semibold hover:bg-primary/90"
+            >
               {loading ? "Creating..." : "Create"}
             </Button>
           </DialogFooter>
@@ -119,4 +156,3 @@ export function CreateGroupModal({ onGroupCreated }: { onGroupCreated?: () => vo
     </Dialog>
   );
 }
-

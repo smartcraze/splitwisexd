@@ -66,11 +66,15 @@ export function LoginForm() {
             required
             disabled={loading}
             className={`w-full bg-background border-border text-foreground focus:ring-ring focus:border-primary ${
-              !isEmailValid && email !== "" ? "border-destructive focus:border-destructive focus:ring-destructive" : ""
+              !isEmailValid && email !== ""
+                ? "border-destructive focus:border-destructive focus:ring-destructive"
+                : ""
             }`}
           />
           {!isEmailValid && email !== "" && (
-            <p className="text-[11px] text-destructive font-medium">Please enter a valid email address</p>
+            <p className="text-[11px] text-destructive font-medium">
+              Please enter a valid email address
+            </p>
           )}
         </div>
 
@@ -96,7 +100,6 @@ export function LoginForm() {
           {loading ? "Signing In..." : "Sign In"}
         </Button>
       </form>
-
 
       <div className="mt-6 text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{" "}

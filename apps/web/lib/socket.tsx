@@ -63,7 +63,6 @@ export function SocketProvider({
     // biome-ignore lint/correctness/useExhaustiveDependencies: socket state updates should not re-run connection setup
   }, [token]);
 
-
   return (
     <SocketContext.Provider value={{ socket, connected }}>
       {children}

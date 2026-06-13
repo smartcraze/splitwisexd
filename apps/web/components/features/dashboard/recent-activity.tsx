@@ -1,7 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, ChevronRight, CreditCard, Receipt, Users } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronRight,
+  CreditCard,
+  Receipt,
+  Users,
+} from "lucide-react";
 import React from "react";
 
 interface ActivityItem {
@@ -19,9 +25,21 @@ interface RecentActivityProps {
 }
 
 const ACTIVITY_ICONS = {
-  expense: { icon: Receipt, bg: "bg-rose-100 dark:bg-rose-900/30", color: "text-rose-600" },
-  settlement: { icon: CreditCard, bg: "bg-emerald-100 dark:bg-emerald-900/30", color: "text-emerald-600" },
-  group: { icon: Users, bg: "bg-violet-100 dark:bg-violet-900/30", color: "text-violet-600" },
+  expense: {
+    icon: Receipt,
+    bg: "bg-rose-100 dark:bg-rose-900/30",
+    color: "text-rose-600",
+  },
+  settlement: {
+    icon: CreditCard,
+    bg: "bg-emerald-100 dark:bg-emerald-900/30",
+    color: "text-emerald-600",
+  },
+  group: {
+    icon: Users,
+    bg: "bg-violet-100 dark:bg-violet-900/30",
+    color: "text-violet-600",
+  },
 };
 
 function timeAgo(date: string) {
@@ -58,14 +76,20 @@ export function RecentActivity({ activities }: RecentActivityProps) {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold truncate">{item.title}</p>
-              <p className="text-xs text-muted-foreground truncate">{item.subtitle}</p>
+              <p className="text-xs text-muted-foreground truncate">
+                {item.subtitle}
+              </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
               <div className="text-right">
                 {item.amount !== undefined && (
-                  <p className="text-sm font-bold text-rose-600">{fmt(item.amount)}</p>
+                  <p className="text-sm font-bold text-rose-600">
+                    {fmt(item.amount)}
+                  </p>
                 )}
-                <p className="text-xs text-muted-foreground">{timeAgo(item.createdAt)}</p>
+                <p className="text-xs text-muted-foreground">
+                  {timeAgo(item.createdAt)}
+                </p>
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
             </div>

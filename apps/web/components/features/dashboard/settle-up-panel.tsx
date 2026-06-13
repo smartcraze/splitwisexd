@@ -19,10 +19,19 @@ interface SettleUpPanelProps {
 
 function getInitials(name: string | undefined) {
   if (!name) return "?";
-  return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 }
 
-export function SettleUpPanel({ debts, currentUserId, onRemind }: SettleUpPanelProps) {
+export function SettleUpPanel({
+  debts,
+  currentUserId,
+  onRemind,
+}: SettleUpPanelProps) {
   if (debts.length === 0) return null;
 
   const fmt = (amount: number) =>
@@ -44,10 +53,15 @@ export function SettleUpPanel({ debts, currentUserId, onRemind }: SettleUpPanelP
           const isCurrentOwer = debt.fromUser.id === currentUserId;
           const name = isCurrentOwer ? debt.toUser.name : debt.fromUser.name;
           const label = isCurrentOwer ? "you owe" : "owes you";
-          const labelColor = isCurrentOwer ? "text-rose-500" : "text-emerald-500";
+          const labelColor = isCurrentOwer
+            ? "text-rose-500"
+            : "text-emerald-500";
 
           return (
-            <div key={`${debt.fromUser.id}-${debt.toUser.id}-${idx}`} className="flex items-center gap-3">
+            <div
+              key={`${debt.fromUser.id}-${debt.toUser.id}-${idx}`}
+              className="flex items-center gap-3"
+            >
               <Avatar className="h-8 w-8 shrink-0">
                 <AvatarFallback className="bg-muted text-muted-foreground text-xs font-bold">
                   {getInitials(name)}
@@ -74,7 +88,10 @@ export function SettleUpPanel({ debts, currentUserId, onRemind }: SettleUpPanelP
       </div>
 
       {debts.length > 4 && (
-        <button type="button" className="mt-4 flex items-center gap-1 text-xs font-semibold text-primary hover:underline">
+        <button
+          type="button"
+          className="mt-4 flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+        >
           View All Settlements <ChevronRight className="h-3.5 w-3.5" />
         </button>
       )}

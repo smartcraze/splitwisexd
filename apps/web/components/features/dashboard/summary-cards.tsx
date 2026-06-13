@@ -51,15 +51,18 @@ export function SummaryCards({ summary }: SummaryProps) {
       sign: summary.totalBalance < 0 ? "-" : "",
       icon: Wallet,
       wave: summary.totalBalance >= 0 ? "#10B981" : "#EF4444",
-      iconBg: summary.totalBalance >= 0
-        ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600"
-        : "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
-      valueColor: summary.totalBalance >= 0 ? "text-foreground" : "text-foreground",
-      description: summary.totalBalance > 0
-        ? "You are owed more than you owe"
-        : summary.totalBalance < 0
-          ? "You owe more than you are owed"
-          : "All balanced",
+      iconBg:
+        summary.totalBalance >= 0
+          ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600"
+          : "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+      valueColor:
+        summary.totalBalance >= 0 ? "text-foreground" : "text-foreground",
+      description:
+        summary.totalBalance > 0
+          ? "You are owed more than you owe"
+          : summary.totalBalance < 0
+            ? "You owe more than you are owed"
+            : "All balanced",
     },
     {
       title: "You Are Owed",
@@ -70,9 +73,10 @@ export function SummaryCards({ summary }: SummaryProps) {
       wave: "#10B981",
       iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
       valueColor: "text-foreground",
-      description: summary.youAreOwed > 0
-        ? "Total money people owe you"
-        : "No outstanding credits.",
+      description:
+        summary.youAreOwed > 0
+          ? "Total money people owe you"
+          : "No outstanding credits.",
     },
     {
       title: "You Owe",
@@ -83,9 +87,10 @@ export function SummaryCards({ summary }: SummaryProps) {
       wave: "#F59E0B",
       iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
       valueColor: "text-foreground",
-      description: summary.youOwe > 0
-        ? "Total money you owe people"
-        : "You don't owe anyone! 🎉",
+      description:
+        summary.youOwe > 0
+          ? "Total money you owe people"
+          : "You don't owe anyone! 🎉",
     },
   ];
 
@@ -111,7 +116,8 @@ export function SummaryCards({ summary }: SummaryProps) {
                 </div>
               </div>
               <div className="text-3xl font-extrabold tracking-tight text-foreground">
-                {card.sign}{card.display}
+                {card.sign}
+                {card.display}
               </div>
               <p className="text-xs text-muted-foreground mt-1.5 mb-1">
                 {card.description}
