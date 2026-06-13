@@ -1,186 +1,26 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap");
 @import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-
-@custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.97 0.008 75); /* Premium Washi Beige */
-  --foreground: oklch(0.18 0.005 75); /* Sumi Ink Charcoal */
-  --card: oklch(0.99 0.003 75); /* Off-white Cream Paper */
-  --card-foreground: oklch(0.18 0.005 75);
-  --popover: oklch(0.99 0.003 75);
-  --popover-foreground: oklch(0.18 0.005 75);
-  --primary: oklch(0.48 0.16 25); /* Japanese Shinto Gate Red */
-  --primary-foreground: oklch(0.98 0.005 75);
-  --secondary: oklch(0.94 0.01 75);
-  --secondary-foreground: oklch(0.18 0.005 75);
-  --muted: oklch(0.93 0.008 75); /* Soft Paper Shade */
-  --muted-foreground: oklch(0.48 0.01 75); /* Charcoal Dust Gray */
-  --accent: oklch(0.93 0.008 75);
-  --accent-foreground: oklch(0.18 0.005 75);
-  --destructive: oklch(0.55 0.18 25);
-  --destructive-foreground: oklch(0.98 0.005 75);
-  --border: oklch(0.88 0.01 75); /* Soft Paper Border */
-  --input: oklch(0.88 0.01 75);
-  --ring: oklch(0.48 0.16 25);
-  --radius: 1rem;
-
-  --chart-1: oklch(0.48 0.16 25);
-  --chart-2: oklch(0.18 0.005 75);
-  --chart-3: oklch(0.55 0.18 25);
-  --chart-4: oklch(0.78 0.08 85);
-  --chart-5: oklch(0.93 0.008 75);
-
-  --sidebar: oklch(0.96 0.008 75);
-  --sidebar-foreground: oklch(0.18 0.005 75);
-  --sidebar-primary: oklch(0.48 0.16 25);
-  --sidebar-primary-foreground: oklch(0.98 0.005 75);
-  --sidebar-accent: oklch(0.93 0.008 75);
-  --sidebar-accent-foreground: oklch(0.18 0.005 75);
-  --sidebar-border: oklch(0.88 0.01 75);
-  --sidebar-ring: oklch(0.48 0.16 25);
-
-  /* Category Plaque Themes - Light Mode */
-  --group-flat-bg: oklch(0.98 0.01 80); /* #FCF9F2 */
-  --group-flat-border: oklch(0.9 0.02 80); /* #EADCC6 */
-  --group-flat-text: oklch(0.45 0.08 75); /* #8F6A3B */
-  --group-flat-stamp: oklch(0.45 0.08 75 / 15%);
-
-  --group-food-bg: oklch(0.97 0.02 20); /* #FAF0F1 */
-  --group-food-border: oklch(0.9 0.03 20); /* #ECD0D4 */
-  --group-food-text: oklch(0.4 0.16 25); /* #C82333 */
-  --group-food-stamp: oklch(0.4 0.16 25 / 15%);
-
-  --group-travel-bg: oklch(0.96 0.02 240); /* #F0F5FA */
-  --group-travel-border: oklch(0.88 0.04 240); /* #D0E2EC */
-  --group-travel-text: oklch(0.4 0.12 240); /* #2E689C */
-  --group-travel-stamp: oklch(0.4 0.12 240 / 15%);
-
-  --group-general-bg: oklch(0.97 0.01 160); /* #F4F8F5 */
-  --group-general-border: oklch(0.89 0.02 160); /* #CCE0D0 */
-  --group-general-text: oklch(0.35 0.06 160); /* #3A5F43 */
-  --group-general-stamp: oklch(0.35 0.06 160 / 15%);
-
-  /* Ledger/Summary Panel - Light Mode (Premium Sumi Charcoal Card) */
-  --summary-bg: oklch(0.12 0.005 75); /* #0A0A0C */
-  --summary-fg: oklch(0.98 0.005 75); /* #FAF9F6 */
-  --summary-border: oklch(0.2 0.005 75); /* #212124 */
-  --summary-card-bg: oklch(0.16 0.005 75); /* #1C1C1F */
-  --summary-card-border: oklch(0.24 0.01 75); /* #2B2B2F */
-  --summary-stat-bg: oklch(0.14 0.005 75); /* #151518 */
-  --summary-btn-bg: oklch(0.98 0.005 75);
-  --summary-btn-fg: oklch(0.12 0.005 75);
-  --summary-btn-hover-bg: oklch(0.92 0.005 75);
-
-  --crimson: oklch(0.48 0.16 25); /* #BC1C2C */
-  --crimson-light: oklch(0.48 0.16 25 / 10%);
-}
-
-.dark {
-  --background: oklch(0.18 0.005 75); /* Softer Sumi Charcoal Background */
-  --foreground: oklch(0.92 0.01 75); /* Soft Cream White */
-  --card: oklch(0.23 0.005 75); /* Softer Dark Slate Card */
-  --card-foreground: oklch(0.92 0.01 75);
-  --popover: oklch(0.23 0.005 75);
-  --popover-foreground: oklch(0.92 0.01 75);
-  --primary: oklch(0.55 0.18 25); /* Vibrant Crimson */
-  --primary-foreground: oklch(0.98 0.005 75);
-  --secondary: oklch(0.25 0.005 75);
-  --secondary-foreground: oklch(0.92 0.01 75);
-  --muted: oklch(0.23 0.005 75);
-  --muted-foreground: oklch(0.65 0.01 75);
-  --border: oklch(0.28 0.005 75); /* Softer Gray Border */
-  --input: oklch(0.28 0.005 75);
-  --ring: oklch(0.55 0.18 25);
-
-  /* Category Plaque Themes - Dark Mode */
-  --group-flat-bg: oklch(0.24 0.01 80); 
-  --group-flat-border: oklch(0.32 0.02 80); 
-  --group-flat-text: oklch(0.75 0.08 80); 
-  --group-flat-stamp: oklch(0.75 0.08 80 / 15%);
-
-  --group-food-bg: oklch(0.24 0.02 20); 
-  --group-food-border: oklch(0.32 0.03 20); 
-  --group-food-text: oklch(0.75 0.12 25); 
-  --group-food-stamp: oklch(0.75 0.12 25 / 15%);
-
-  --group-travel-bg: oklch(0.24 0.02 240); 
-  --group-travel-border: oklch(0.32 0.04 240); 
-  --group-travel-text: oklch(0.75 0.08 240); 
-  --group-travel-stamp: oklch(0.75 0.08 240 / 15%);
-
-  --group-general-bg: oklch(0.24 0.01 160); 
-  --group-general-border: oklch(0.32 0.02 160); 
-  --group-general-text: oklch(0.72 0.05 160); 
-  --group-general-stamp: oklch(0.72 0.05 160 / 15%);
-
-  /* Ledger/Summary Panel - Softer dark theme contrast */
-  --summary-bg: oklch(0.12 0.005 75);
-  --summary-fg: oklch(0.92 0.01 75);
-  --summary-border: oklch(0.18 0.005 75);
-  --summary-card-bg: oklch(0.17 0.005 75);
-  --summary-card-border: oklch(0.23 0.01 75);
-  --summary-stat-bg: oklch(0.15 0.005 75);
-  --summary-btn-bg: oklch(0.92 0.01 75);
-  --summary-btn-fg: oklch(0.12 0.005 75);
-  --summary-btn-hover-bg: oklch(0.85 0.01 75);
-
-  --crimson: oklch(0.55 0.18 25);
-  --crimson-light: oklch(0.55 0.18 25 / 15%);
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-
-  --font-sans: "Plus Jakarta Sans", var(--font-sans), sans-serif;
-  --font-serif: "Noto Serif JP", Georgia, serif;
-  --font-mono: var(--font-mono);
-
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50 font-sans;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
   }
-  body {
-    @apply bg-background text-foreground font-sans;
-    font-family: "Plus Jakarta Sans", sans-serif;
-  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
 }
