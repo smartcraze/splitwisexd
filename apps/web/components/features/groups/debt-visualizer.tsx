@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import React from "react";
 
 interface Debt {
@@ -48,7 +47,7 @@ export function DebtVisualizer({
       };
     });
     return positions;
-  }, [members, cx, cy, r]);
+  }, [members, cx, cy]);
 
   const getNetBalance = (userId: string) => {
     return balances.find((b) => b.userId === userId)?.netBalance || 0;

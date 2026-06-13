@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Calendar, ChevronRight, Plus, Search, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/components/features/auth/auth-context";
 import { CreateGroupModal } from "@/components/features/dashboard/create-group-modal";
 import { Input } from "@/components/ui/input";
@@ -79,7 +79,7 @@ export function GroupsView() {
 
   useEffect(() => {
     if (user) fetchGroups();
-  }, [user]);
+  }, [user, fetchGroups]);
 
   if (loading) {
     return <GroupsSkeleton />;

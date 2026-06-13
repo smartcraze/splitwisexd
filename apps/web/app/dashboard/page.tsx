@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/components/features/auth/auth-context";
-import { AppLayout } from "@/components/features/layout/app-layout";
+import { DashboardSkeleton } from "@/components/features/dashboard/dashboard-skeleton";
 import { GroupsList } from "@/components/features/dashboard/groups-list";
 import { RecentActivity } from "@/components/features/dashboard/recent-activity";
 import { SettleUpPanel } from "@/components/features/dashboard/settle-up-panel";
 import { SpendingChart } from "@/components/features/dashboard/spending-chart";
 import { SummaryCards } from "@/components/features/dashboard/summary-cards";
-import { DashboardSkeleton } from "@/components/features/dashboard/dashboard-skeleton";
+import { AppLayout } from "@/components/features/layout/app-layout";
 import { api } from "@/lib/api";
 
 export default function DashboardPage() {
@@ -90,7 +90,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (user) fetchData();
     // biome-ignore lint/correctness/useExhaustiveDependencies: run only when user changes
-  }, [user]);
+  }, [user, fetchData]);
 
   if (authLoading || (user && loading)) {
     return (

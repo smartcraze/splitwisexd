@@ -2,7 +2,6 @@
 
 import { ArrowLeft, CreditCard, PlusCircle, UserPlus } from "lucide-react";
 import Link from "next/link";
-import React from "react";
 import { Button } from "@/components/ui/button";
 
 interface GroupHeaderProps {

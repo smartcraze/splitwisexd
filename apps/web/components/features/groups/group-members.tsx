@@ -1,7 +1,7 @@
 "use client";
 
 import { Crown, UserMinus } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";

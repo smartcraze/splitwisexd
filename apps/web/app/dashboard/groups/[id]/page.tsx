@@ -1,20 +1,20 @@
 "use client";
 
-import React, { use, useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useAuth } from "@/components/features/auth/auth-context";
-import { AppLayout } from "@/components/features/layout/app-layout";
 import { ExpenseFormDialog } from "@/components/features/expenses/expense-form-dialog";
 import { ExpenseList } from "@/components/features/expenses/expense-list";
 import { AddMemberDialog } from "@/components/features/groups/add-member-dialog";
 import { DebtVisualizer } from "@/components/features/groups/debt-visualizer";
+import { GroupDetailSkeleton } from "@/components/features/groups/group-detail-skeleton";
 import { GroupHeader } from "@/components/features/groups/group-header";
 import { GroupMembers } from "@/components/features/groups/group-members";
+import { AppLayout } from "@/components/features/layout/app-layout";
 import { SettleUpDialog } from "@/components/features/settlements/settle-up-dialog";
 import { SettlementsList } from "@/components/features/settlements/settlements-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
 import { useSocket } from "@/lib/socket";
-import { GroupDetailSkeleton } from "@/components/features/groups/group-detail-skeleton";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -58,7 +58,7 @@ export default function GroupPage(props: Props) {
   useEffect(() => {
     if (groupId) fetchData();
     // biome-ignore lint/correctness/useExhaustiveDependencies: run only on mount/groupId change
-  }, [groupId]);
+  }, [groupId, fetchData]);
 
   useEffect(() => {
     if (!socket || !groupId) return;
@@ -69,7 +69,7 @@ export default function GroupPage(props: Props) {
       socket.off("balance_update", fetchData);
     };
     // biome-ignore lint/correctness/useExhaustiveDependencies: socket registers listener once
-  }, [socket, groupId]);
+  }, [socket, groupId, fetchData]);
 
   const handleSettleQuick = (fromId: string, toId: string, amount: number) => {
     setPrefillSettle(

@@ -1,7 +1,6 @@
 "use client";
 
 import { ArrowRight, CheckCircle2 } from "lucide-react";
-import React from "react";
 
 interface Settlement {
   id: string;

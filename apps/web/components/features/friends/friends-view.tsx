@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowDownLeft, ArrowUpRight, Users2 } from "lucide-react";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/components/features/auth/auth-context";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";

@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { ArrowDownLeft, ArrowUpRight, Wallet } from "lucide-react";
-import React from "react";
 
 interface SummaryProps {
   summary: {

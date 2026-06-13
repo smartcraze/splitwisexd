@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { Calendar, ChevronRight, Plus, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 import { CreateGroupModal } from "./create-group-modal";
 
 interface Group {

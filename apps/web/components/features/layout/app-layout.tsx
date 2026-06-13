@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import type React from "react";
 import { AppSidebar } from "./app-sidebar";
 import { TopNavbar } from "./top-navbar";
 

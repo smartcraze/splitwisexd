@@ -2,7 +2,7 @@
 
 import { ArrowLeft, Calendar, Info, Receipt, User } from "lucide-react";
 import Link from "next/link";
-import React, { use, useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useAuth } from "@/components/features/auth/auth-context";
 import { CommentsSection } from "@/components/features/comments/comments-section";
 import { AppLayout } from "@/components/features/layout/app-layout";

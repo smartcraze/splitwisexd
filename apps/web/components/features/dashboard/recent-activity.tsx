@@ -8,7 +8,6 @@ import {
   Receipt,
   Users,
 } from "lucide-react";
-import React from "react";
 
 interface ActivityItem {
   id: string;

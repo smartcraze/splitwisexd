@@ -1,16 +1,16 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Bell, Landmark, Menu, X } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { useAuth } from "@/components/features/auth/auth-context";
 import { CreateGroupModal } from "@/components/features/dashboard/create-group-modal";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { usePathname } from "next/navigation";
 import { NAV_ITEMS } from "./nav-items";
 
 interface TopNavbarProps {

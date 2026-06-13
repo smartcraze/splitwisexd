@@ -60,7 +60,7 @@ export function CommentsSection({
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     // biome-ignore lint/correctness/useExhaustiveDependencies: scroll when comments state changes
-  }, [comments]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

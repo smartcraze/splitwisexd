@@ -4,14 +4,15 @@ import { motion } from "framer-motion";
 import { Bell, Landmark, LogOut, Smartphone, Users2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/components/features/auth/auth-context";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "./nav-items";
-import { api } from "@/lib/api";
 
 const EXTRA_NAV = [
   { href: "/dashboard/friends", label: "Friends", icon: Users2 },

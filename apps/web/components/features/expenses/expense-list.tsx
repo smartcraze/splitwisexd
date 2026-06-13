@@ -2,7 +2,6 @@
 
 import { Edit2, MessageSquare, Trash2 } from "lucide-react";
 import Link from "next/link";
-import React from "react";
 import { Button } from "@/components/ui/button";
 
 interface ExpenseParticipant {
