@@ -60,10 +60,10 @@ function getGroupImage(name: string, index: number): string {
   return GROUP_IMAGES[index % GROUP_IMAGES.length];
 }
 
-export function GroupsView() {
+export function GroupsView({ initialGroups }: { initialGroups: any[] }) {
   const { user } = useAuth();
-  const [groups, setGroups] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [groups, setGroups] = useState<any[]>(initialGroups);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
   const fetchGroups = async () => {
@@ -72,8 +72,6 @@ export function GroupsView() {
       setGroups(data);
     } catch (e) {
       console.error(e);
-    } finally {
-      setLoading(false);
     }
   };
 

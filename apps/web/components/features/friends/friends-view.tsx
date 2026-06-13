@@ -28,62 +28,63 @@ function initials(name: string) {
     .slice(0, 2);
 }
 
-export function FriendsView() {
+export function FriendsView({ initialFriends }: { initialFriends: Friend[] }) {
   const { user } = useAuth();
-  const [friends, setFriends] = useState<Friend[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [friends, setFriends] = useState<Friend[]>(initialFriends);
+  const [loading, setLoading] = useState(false);
+
+  const fetchFriends = async () => {
+    if (!user) return;
+    try {
+      const groups = await api.getGroups();
+      const friendMap = new Map<string, Friend>();
+
+      await Promise.all(
+        groups.map(async (g: any) => {
+          const { debts } = await api.getBalances(g.id);
+          for (const debt of debts ?? []) {
+            const isOwer = debt.fromUser.id === user.id;
+            const isPayer = debt.toUser.id === user.id;
+            if (!isOwer && !isPayer) continue;
+
+            const otherId = isOwer ? debt.toUser.id : debt.fromUser.id;
+            const otherName = isOwer ? debt.toUser.name : debt.fromUser.name;
+            const otherEmail = isOwer
+              ? (debt.toUser.email ?? "")
+              : (debt.fromUser.email ?? "");
+
+            if (!friendMap.has(otherId)) {
+              friendMap.set(otherId, {
+                userId: otherId,
+                name: otherName,
+                email: otherEmail,
+                youOwe: 0,
+                owesYou: 0,
+                groupIds: [],
+              });
+            }
+            const f = friendMap.get(otherId)!;
+            if (!f.groupIds.includes(g.id)) f.groupIds.push(g.id);
+            if (isOwer) f.youOwe += debt.amount;
+            else f.owesYou += debt.amount;
+          }
+        }),
+      );
+
+      setFriends(
+        Array.from(friendMap.values()).sort(
+          (a, b) => b.owesYou + b.youOwe - (a.owesYou + a.youOwe),
+        ),
+      );
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   useEffect(() => {
-    if (!user) return;
-    (async () => {
-      try {
-        const groups = await api.getGroups();
-        // Aggregate per-person balances across all groups
-        const friendMap = new Map<string, Friend>();
-
-        await Promise.all(
-          groups.map(async (g: any) => {
-            const { debts } = await api.getBalances(g.id);
-            for (const debt of debts ?? []) {
-              const isOwer = debt.fromUser.id === user.id;
-              const isPayer = debt.toUser.id === user.id;
-              if (!isOwer && !isPayer) continue;
-
-              const otherId = isOwer ? debt.toUser.id : debt.fromUser.id;
-              const otherName = isOwer ? debt.toUser.name : debt.fromUser.name;
-              const otherEmail = isOwer
-                ? (debt.toUser.email ?? "")
-                : (debt.fromUser.email ?? "");
-
-              if (!friendMap.has(otherId)) {
-                friendMap.set(otherId, {
-                  userId: otherId,
-                  name: otherName,
-                  email: otherEmail,
-                  youOwe: 0,
-                  owesYou: 0,
-                  groupIds: [],
-                });
-              }
-              const f = friendMap.get(otherId)!;
-              if (!f.groupIds.includes(g.id)) f.groupIds.push(g.id);
-              if (isOwer) f.youOwe += debt.amount;
-              else f.owesYou += debt.amount;
-            }
-          }),
-        );
-
-        setFriends(
-          Array.from(friendMap.values()).sort(
-            (a, b) => b.owesYou + b.youOwe - (a.owesYou + a.youOwe),
-          ),
-        );
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    })();
+    if (user) {
+      fetchFriends();
+    }
   }, [user]);
 
   if (loading) {

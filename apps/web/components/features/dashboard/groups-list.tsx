@@ -97,66 +97,68 @@ export function GroupsList({ groups, onGroupCreated }: GroupsListProps) {
               y: -3,
               transition: { type: "spring", stiffness: 400, damping: 28 },
             }}
-            className="group rounded-2xl border border-border bg-card shadow-sm hover:shadow-md transition-all overflow-hidden"
+            className="group rounded-2xl border border-border bg-card shadow-sm hover:shadow-md transition-all overflow-hidden cursor-pointer"
           >
-            {/* Image */}
-            <div className="relative h-36 w-full overflow-hidden">
-              <Image
-                src={imgSrc}
-                alt={group.name}
-                fill
-                loading={index === 0 ? "eager" : "lazy"}
-                priority={index === 0}
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-                sizes="(max-width: 768px) 100vw, 33vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-              <div className="absolute top-3 right-3 p-1.5 bg-white/20 backdrop-blur-sm rounded-lg">
-                <Users className="h-3.5 w-3.5 text-white" />
+            <Link
+              href={`/dashboard/groups/${group.id}`}
+              className="block h-full"
+            >
+              {/* Image */}
+              <div className="relative h-36 w-full overflow-hidden">
+                <Image
+                  src={imgSrc}
+                  alt={group.name}
+                  fill
+                  loading={index === 0 ? "eager" : "lazy"}
+                  priority={index === 0}
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                <div className="absolute top-3 right-3 p-1.5 bg-white/20 backdrop-blur-sm rounded-lg">
+                  <Users className="h-3.5 w-3.5 text-white" />
+                </div>
               </div>
-            </div>
 
-            {/* Content */}
-            <div className="p-4">
-              <h3 className="font-bold text-base leading-tight group-hover:text-primary transition-colors">
-                {group.name}
-              </h3>
-              <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
-                {group.description || "No description"}
-              </p>
+              {/* Content */}
+              <div className="p-4">
+                <h3 className="font-bold text-base leading-tight group-hover:text-primary transition-colors">
+                  {group.name}
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
+                  {group.description || "No description"}
+                </p>
 
-              {balanceStr && (
-                <div className="mt-2">
-                  <span
-                    className={`text-sm font-bold ${isPositive ? "text-emerald-600" : "text-rose-600"}`}
-                  >
-                    {balanceStr}
+                {balanceStr && (
+                  <div className="mt-2">
+                    <span
+                      className={`text-sm font-bold ${isPositive ? "text-emerald-600" : "text-rose-600"}`}
+                    >
+                      {balanceStr}
+                    </span>
+                    <span
+                      className={`text-xs ml-1 ${isPositive ? "text-emerald-500" : "text-rose-500"}`}
+                    >
+                      {isPositive ? "You are owed" : "You owe"}
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between mt-3 pt-3 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="h-3 w-3" />
+                    {new Date(group.createdAt).toLocaleDateString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
                   </span>
-                  <span
-                    className={`text-xs ml-1 ${isPositive ? "text-emerald-500" : "text-rose-500"}`}
-                  >
-                    {isPositive ? "You are owed" : "You owe"}
+                  <span className="flex items-center gap-0.5 font-semibold text-primary hover:underline">
+                    View <ChevronRight className="h-3.5 w-3.5" />
                   </span>
                 </div>
-              )}
-
-              <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/50 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-3 w-3" />
-                  {new Date(group.createdAt).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </span>
-                <Link
-                  href={`/dashboard/groups/${group.id}`}
-                  className="flex items-center gap-0.5 font-semibold text-primary hover:underline"
-                >
-                  View <ChevronRight className="h-3.5 w-3.5" />
-                </Link>
               </div>
-            </div>
+            </Link>
           </motion.div>
         );
       })}

@@ -3,6 +3,7 @@ import { ApiResponse } from "../../lib/api-response.ts";
 import { AppError } from "../../lib/app-error.ts";
 import { asyncHandler } from "../../lib/async-handler.ts";
 import { io } from "../../lib/socket.ts";
+import { invalidateCache } from "../../lib/cache.ts";
 import type { AuthRequest } from "../../middleware/auth.ts";
 import { ExpensesRepository } from "../expenses/expenses.repository.ts";
 import { GroupsRepository } from "../groups/groups.repository.ts";
@@ -48,6 +49,8 @@ export const createComment = asyncHandler(
       userId,
       message,
     );
+
+    invalidateCache([`expense-comments-${expenseId}`]);
 
     if (io) {
       io.to(`expense:${expenseId}`).emit("new_comment", comment);

@@ -1,189 +1,108 @@
-"use client";
-
-import { use, useEffect, useState } from "react";
-import { useAuth } from "@/components/features/auth/auth-context";
-import { ExpenseFormDialog } from "@/components/features/expenses/expense-form-dialog";
-import { ExpenseList } from "@/components/features/expenses/expense-list";
-import { AddMemberDialog } from "@/components/features/groups/add-member-dialog";
-import { DebtVisualizer } from "@/components/features/groups/debt-visualizer";
-import { GroupDetailSkeleton } from "@/components/features/groups/group-detail-skeleton";
-import { GroupHeader } from "@/components/features/groups/group-header";
-import { GroupMembers } from "@/components/features/groups/group-members";
+import React, { Suspense } from "react";
+import { notFound, redirect } from "next/navigation";
+import { getSessionUser } from "@/lib/session";
+import { getCachedExpenses, getCachedSettlements, getGroupBalances } from "@/lib/queries";
 import { AppLayout } from "@/components/features/layout/app-layout";
-import { SettleUpDialog } from "@/components/features/settlements/settle-up-dialog";
-import { SettlementsList } from "@/components/features/settlements/settlements-list";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { api } from "@/lib/api";
-import { useSocket } from "@/lib/socket";
+import { GroupPageContent } from "@/components/features/groups/group-page-content";
+import { GroupDetailSkeleton } from "@/components/features/groups/group-detail-skeleton";
+import { prisma } from "@repo/db";
 
 type Props = { params: Promise<{ id: string }> };
 
-export default function GroupPage(props: Props) {
-  const { id: groupId } = use(props.params);
-  const { user } = useAuth();
-  const { socket } = useSocket();
-  const [group, setGroup] = useState<any>(null);
-  const [expenses, setExpenses] = useState<any[]>([]);
-  const [settlements, setSettlements] = useState<any[]>([]);
-  const [balances, setBalances] = useState<any[]>([]);
-  const [debts, setDebts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const [expenseOpen, setExpenseOpen] = useState(false);
-  const [editExpense, setEditExpense] = useState<any>(null);
-  const [settleOpen, setSettleOpen] = useState(false);
-  const [memberOpen, setMemberOpen] = useState(false);
-  const [prefillSettle, setPrefillSettle] = useState<any>(null);
-
-  const fetchData = async () => {
-    try {
-      const [details, expList, setlList, balData] = await Promise.all([
-        api.getGroupById(groupId),
-        api.getExpenses(groupId),
-        api.getSettlements(groupId),
-        api.getBalances(groupId),
-      ]);
-      setGroup(details);
-      setExpenses(expList);
-      setSettlements(setlList);
-      setBalances(balData.balances);
-      setDebts(balData.debts);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (groupId) fetchData();
-    // biome-ignore lint/correctness/useExhaustiveDependencies: run only on mount/groupId change
-  }, [groupId, fetchData]);
-
-  useEffect(() => {
-    if (!socket || !groupId) return;
-    socket.emit("join_group", groupId);
-    socket.on("balance_update", fetchData);
-    return () => {
-      socket.emit("leave_group", groupId);
-      socket.off("balance_update", fetchData);
-    };
-    // biome-ignore lint/correctness/useExhaustiveDependencies: socket registers listener once
-  }, [socket, groupId, fetchData]);
-
-  const handleSettleQuick = (fromId: string, toId: string, amount: number) => {
-    setPrefillSettle(
-      fromId === user?.id
-        ? { paidToUserId: toId, amount }
-        : { paidToUserId: fromId, amount },
-    );
-    setSettleOpen(true);
-  };
-
-  const handleDeleteExpense = async (expId: string) => {
-    if (confirm("Are you sure?")) {
-      await api.deleteExpense(expId);
-      fetchData();
-    }
-  };
-
-  if (loading || !user) {
-    return (
-      <AppLayout>
-        <GroupDetailSkeleton />
-      </AppLayout>
-    );
-  }
-
+export default function GroupPage({ params }: Props) {
   return (
     <AppLayout>
-      <div className="max-w-5xl mx-auto space-y-6">
-        <GroupHeader
-          name={group.name}
-          description={group.description}
-          onAddExpense={() => {
-            setEditExpense(null);
-            setExpenseOpen(true);
-          }}
-          onSettleUp={() => {
-            setPrefillSettle(null);
-            setSettleOpen(true);
-          }}
-          onAddMember={() => setMemberOpen(true)}
-        />
-
-        <div className="grid gap-6 md:grid-cols-3 items-start">
-          {/* Main content */}
-          <div className="md:col-span-2 space-y-6 bg-card border border-border p-6 rounded-xl shadow-sm">
-            <Tabs defaultValue="expenses" className="w-full">
-              <TabsList className="bg-muted border border-border grid grid-cols-2 mb-4">
-                <TabsTrigger value="expenses">Expenses</TabsTrigger>
-                <TabsTrigger value="settlements">Settlements</TabsTrigger>
-              </TabsList>
-              <TabsContent value="expenses">
-                <ExpenseList
-                  groupId={groupId}
-                  expenses={expenses}
-                  currentUserId={user.id}
-                  groupCreatorId={group.createdById}
-                  onEdit={(e) => {
-                    setEditExpense(e);
-                    setExpenseOpen(true);
-                  }}
-                  onDelete={handleDeleteExpense}
-                />
-              </TabsContent>
-              <TabsContent value="settlements">
-                <TabsTrigger value="settlements" className="hidden" />
-                <SettlementsList settlements={settlements} />
-              </TabsContent>
-            </Tabs>
-          </div>
-
-          {/* Sidebar panels */}
-          <div className="space-y-6">
-            <DebtVisualizer
-              members={group.members}
-              balances={balances}
-              debts={debts}
-              onSettleDebt={handleSettleQuick}
-            />
-            <div className="bg-card border border-border p-6 rounded-xl shadow-sm">
-              <GroupMembers
-                groupId={groupId}
-                members={group.members}
-                currentUserId={user.id}
-                creatorId={group.createdById}
-                onMemberRemoved={fetchData}
-              />
-            </div>
-          </div>
-        </div>
-
-        <ExpenseFormDialog
-          groupId={groupId}
-          members={group.members}
-          open={expenseOpen}
-          onOpenChange={setExpenseOpen}
-          onExpenseSaved={fetchData}
-          editExpense={editExpense}
-        />
-        <SettleUpDialog
-          groupId={groupId}
-          members={group.members}
-          currentUserId={user.id}
-          open={settleOpen}
-          onOpenChange={setSettleOpen}
-          onSettlementSaved={fetchData}
-          prefill={prefillSettle}
-        />
-        <AddMemberDialog
-          groupId={groupId}
-          open={memberOpen}
-          onOpenChange={setMemberOpen}
-          onMemberAdded={fetchData}
-        />
-      </div>
+      <Suspense fallback={<GroupDetailSkeleton />}>
+        <GroupPageDynamic params={params} />
+      </Suspense>
     </AppLayout>
+  );
+}
+
+async function GroupPageDynamic({ params }: Props) {
+  const { id: groupId } = await params;
+  const user = await getSessionUser();
+  if (!user) {
+    redirect("/login");
+  }
+
+  // Security: Check if user is a member of the group
+  const membership = await prisma.groupMember.findUnique({
+    where: {
+      groupId_userId: {
+        groupId,
+        userId: user.id,
+      },
+    },
+  });
+
+  if (!membership) {
+    redirect("/dashboard/groups");
+  }
+
+  // Fetch data concurrently on the server
+  const [group, expenses, settlements, balancesData] = await Promise.all([
+    prisma.group.findUnique({
+      where: { id: groupId },
+      include: {
+        members: {
+          include: {
+            user: { select: { id: true, name: true, email: true, avatarUrl: true } },
+          },
+        },
+      },
+    }),
+    getCachedExpenses(groupId),
+    getCachedSettlements(groupId),
+    getGroupBalances(groupId),
+  ]);
+
+  if (!group) {
+    notFound();
+  }
+
+  // Serialize objects for client hydration
+  const serializedGroup = {
+    ...group,
+    createdAt: group.createdAt.toISOString(),
+    updatedAt: group.updatedAt.toISOString(),
+    members: group.members.map((m) => ({
+      ...m,
+      joinedAt: m.joinedAt.toISOString(),
+      user: { ...m.user },
+    })),
+  };
+
+  const serializedExpenses = expenses.map((e) => ({
+    ...e,
+    createdAt: e.createdAt.toISOString(),
+    updatedAt: e.updatedAt.toISOString(),
+  }));
+
+  const serializedSettlements = settlements.map((s) => ({
+    ...s,
+    createdAt: s.createdAt.toISOString(),
+  }));
+
+  const serializedBalances = balancesData.balances.map((b) => ({
+    ...b,
+  }));
+
+  const serializedDebts = balancesData.debts.map((d) => ({
+    ...d,
+    fromUser: { ...d.fromUser },
+    toUser: { ...d.toUser },
+  }));
+
+  return (
+    <GroupPageContent
+      groupId={groupId}
+      group={serializedGroup}
+      expenses={serializedExpenses}
+      settlements={serializedSettlements}
+      balances={serializedBalances}
+      debts={serializedDebts}
+      currentUser={user}
+    />
   );
 }

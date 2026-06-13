@@ -30,35 +30,42 @@ function initials(name: string) {
     .slice(0, 2);
 }
 
-export function SettlementsView() {
+export function SettlementsView({
+  initialSettlements,
+}: {
+  initialSettlements: SettlementRow[];
+}) {
   const { user } = useAuth();
-  const [settlements, setSettlements] = useState<SettlementRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [settlements, setSettlements] =
+    useState<SettlementRow[]>(initialSettlements);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
+  const fetchSettlements = async () => {
     if (!user) return;
-    (async () => {
-      try {
-        const groups = await api.getGroups();
-        const all: SettlementRow[] = [];
-        await Promise.all(
-          groups.map(async (g: any) => {
-            const s = await api.getSettlements(g.id);
-            s.forEach((item: any) => all.push({ ...item, groupName: g.name }));
-          }),
-        );
-        all.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-        );
-        setSettlements(all);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    })();
+    try {
+      const groups = await api.getGroups();
+      const all: SettlementRow[] = [];
+      await Promise.all(
+        groups.map(async (g: any) => {
+          const s = await api.getSettlements(g.id);
+          s.forEach((item: any) => all.push({ ...item, groupName: g.name }));
+        }),
+      );
+      all.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+      setSettlements(all);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchSettlements();
+    }
   }, [user]);
 
   if (loading) {

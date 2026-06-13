@@ -1,8 +1,10 @@
 import type { Request, Response } from "express";
+import { prisma } from "@repo/db";
 import { ApiResponse } from "../../lib/api-response.ts";
 import { AppError } from "../../lib/app-error.ts";
 import { asyncHandler } from "../../lib/async-handler.ts";
 import { io } from "../../lib/socket.ts";
+import { invalidateCache } from "../../lib/cache.ts";
 import type { AuthRequest } from "../../middleware/auth.ts";
 import { GroupsRepository } from "./groups.repository.ts";
 import { addMemberSchema, createGroupSchema } from "./groups.schemas.ts";
@@ -36,6 +38,7 @@ export const createGroup = asyncHandler(async (req: Request, res: Response) => {
 
   const addedEmails = [authReq.user.email];
   const skippedEmails: string[] = [];
+  const memberUserIds: string[] = [creatorId];
 
   if (memberEmails && memberEmails.length > 0) {
     for (const email of memberEmails) {
@@ -46,6 +49,7 @@ export const createGroup = asyncHandler(async (req: Request, res: Response) => {
         try {
           await GroupsRepository.addMemberToGroup(group.id, user.id);
           addedEmails.push(email);
+          memberUserIds.push(user.id);
         } catch (_e) {
           skippedEmails.push(email);
         }
@@ -54,6 +58,13 @@ export const createGroup = asyncHandler(async (req: Request, res: Response) => {
       }
     }
   }
+
+  // Invalidate cache for all group members
+  const tagsToInvalidate = memberUserIds.flatMap((id) => [
+    `user-groups-${id}`,
+    `user-summary-${id}`,
+  ]);
+  invalidateCache(tagsToInvalidate);
 
   res.status(201).json(
     ApiResponse.success("Group created successfully", {
@@ -153,6 +164,21 @@ export const addMember = asyncHandler(async (req: Request, res: Response) => {
     userToAdd.id,
   );
 
+  // Invalidate cache for all members
+  const members = await prisma.groupMember.findMany({
+    where: { groupId },
+    select: { userId: true },
+  });
+  const memberUserIds = members.map((m) => m.userId);
+  const tagsToInvalidate = [
+    `group-balances-${groupId}`,
+    ...memberUserIds.flatMap((id) => [
+      `user-groups-${id}`,
+      `user-summary-${id}`,
+    ]),
+  ];
+  invalidateCache(tagsToInvalidate);
+
   if (io) {
     io.to(`group:${groupId}`).emit("balance_update", { groupId });
   }
@@ -209,7 +235,25 @@ export const removeMember = asyncHandler(
       );
     }
 
+    // Fetch members before removing to invalidate target user's caches as well
+    const members = await prisma.groupMember.findMany({
+      where: { groupId },
+      select: { userId: true },
+    });
+    const memberUserIds = Array.from(
+      new Set([...members.map((m) => m.userId), targetUserId]),
+    );
+
     await GroupsRepository.removeMemberFromGroup(groupId, targetUserId);
+
+    const tagsToInvalidate = [
+      `group-balances-${groupId}`,
+      ...memberUserIds.flatMap((id) => [
+        `user-groups-${id}`,
+        `user-summary-${id}`,
+      ]),
+    ];
+    invalidateCache(tagsToInvalidate);
 
     if (io) {
       io.to(`group:${groupId}`).emit("balance_update", { groupId });

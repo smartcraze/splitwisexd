@@ -1,8 +1,10 @@
 import type { Request, Response } from "express";
+import { prisma } from "@repo/db";
 import { ApiResponse } from "../../lib/api-response.ts";
 import { AppError } from "../../lib/app-error.ts";
 import { asyncHandler } from "../../lib/async-handler.ts";
 import { io } from "../../lib/socket.ts";
+import { invalidateCache } from "../../lib/cache.ts";
 import type { AuthRequest } from "../../middleware/auth.ts";
 import { GroupsRepository } from "../groups/groups.repository.ts";
 import { SettlementsRepository } from "./settlements.repository.ts";
@@ -53,6 +55,19 @@ export const createSettlement = asyncHandler(
       amount,
       note,
     });
+
+    // Invalidate Next.js cache
+    const members = await prisma.groupMember.findMany({
+      where: { groupId },
+      select: { userId: true },
+    });
+    const memberUserIds = members.map((m) => m.userId);
+    const tagsToInvalidate = [
+      `group-settlements-${groupId}`,
+      `group-balances-${groupId}`,
+      ...memberUserIds.flatMap((id) => [`user-summary-${id}`]),
+    ];
+    invalidateCache(tagsToInvalidate);
 
     if (io) {
       io.to(`group:${groupId}`).emit("balance_update", { groupId });

@@ -45,36 +45,42 @@ interface ExpenseRow {
   createdAt: string;
 }
 
-export function ExpensesView() {
+export function ExpensesView({
+  initialExpenses,
+}: {
+  initialExpenses: ExpenseRow[];
+}) {
   const { user } = useAuth();
-  const [expenses, setExpenses] = useState<ExpenseRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [expenses, setExpenses] = useState<ExpenseRow[]>(initialExpenses);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [filterMethod, setFilterMethod] = useState<string>("ALL");
 
-  useEffect(() => {
+  const fetchExpenses = async () => {
     if (!user) return;
-    (async () => {
-      try {
-        const groups = await api.getGroups();
-        const all: ExpenseRow[] = [];
-        await Promise.all(
-          groups.map(async (g: any) => {
-            const exps = await api.getExpenses(g.id);
-            exps.forEach((e: any) => all.push({ ...e, groupName: g.name }));
-          }),
-        );
-        all.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-        );
-        setExpenses(all);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    })();
+    try {
+      const groups = await api.getGroups();
+      const all: ExpenseRow[] = [];
+      await Promise.all(
+        groups.map(async (g: any) => {
+          const exps = await api.getExpenses(g.id);
+          exps.forEach((e: any) => all.push({ ...e, groupName: g.name }));
+        }),
+      );
+      all.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+      setExpenses(all);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchExpenses();
+    }
   }, [user]);
 
   if (loading) {

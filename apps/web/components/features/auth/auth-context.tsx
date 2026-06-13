@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import type React from "react";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, Suspense } from "react";
 import { api } from "@/lib/api";
 
 interface User {
@@ -32,12 +32,29 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
+function AuthRedirectGuard({ user, loading }: { user: User | null; loading: boolean }) {
+  const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading) {
+      const isAuthPage = pathname === "/login" || pathname === "/register";
+      if (!user && !isAuthPage) {
+        router.replace("/login");
+      } else if (user && isAuthPage) {
+        router.replace("/dashboard");
+      }
+    }
+  }, [user, loading, pathname, router]);
+
+  return null;
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
     async function loadUser() {
@@ -59,21 +76,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loadUser();
   }, []);
 
-  // Protect pages
-  useEffect(() => {
-    if (!loading) {
-      const isAuthPage = pathname === "/login" || pathname === "/register";
-      if (!user && !isAuthPage) {
-        router.replace("/login");
-      } else if (user && isAuthPage) {
-        router.replace("/dashboard");
-      }
-    }
-  }, [user, loading, pathname, router]);
-
   const login = async (email: string, password: string) => {
     const data = await api.login({ email, password });
     localStorage.setItem("token", data.token);
+    document.cookie = `token=${data.token}; path=/; max-age=604800; SameSite=Lax`;
     setToken(data.token);
     setUser(data.user);
     router.replace("/dashboard");
@@ -82,6 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (name: string, email: string, password: string) => {
     const data = await api.register({ name, email, password });
     localStorage.setItem("token", data.token);
+    document.cookie = `token=${data.token}; path=/; max-age=604800; SameSite=Lax`;
     setToken(data.token);
     setUser(data.user);
     router.replace("/dashboard");
@@ -89,6 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     localStorage.removeItem("token");
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     setToken(null);
     setUser(null);
     router.replace("/login");
@@ -99,6 +107,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{ user, token, loading, login, register, logout }}
     >
       {children}
+      <Suspense fallback={null}>
+        <AuthRedirectGuard user={user} loading={loading} />
+      </Suspense>
     </AuthContext.Provider>
   );
 }

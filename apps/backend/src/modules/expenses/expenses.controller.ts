@@ -1,8 +1,10 @@
 import type { Request, Response } from "express";
+import { prisma } from "@repo/db";
 import { ApiResponse } from "../../lib/api-response.ts";
 import { AppError } from "../../lib/app-error.ts";
 import { asyncHandler } from "../../lib/async-handler.ts";
 import { io } from "../../lib/socket.ts";
+import { invalidateCache } from "../../lib/cache.ts";
 import type { AuthRequest } from "../../middleware/auth.ts";
 import { GroupsRepository } from "../groups/groups.repository.ts";
 import { ExpensesRepository } from "./expenses.repository.ts";
@@ -220,6 +222,19 @@ export const createExpense = asyncHandler(
       calculatedParticipants,
     );
 
+    // Invalidate Next.js cache
+    const members = await prisma.groupMember.findMany({
+      where: { groupId },
+      select: { userId: true },
+    });
+    const memberUserIds = members.map((m) => m.userId);
+    const tagsToInvalidate = [
+      `group-expenses-${groupId}`,
+      `group-balances-${groupId}`,
+      ...memberUserIds.flatMap((id) => [`user-summary-${id}`]),
+    ];
+    invalidateCache(tagsToInvalidate);
+
     if (io) {
       io.to(`group:${groupId}`).emit("balance_update", { groupId });
     }
@@ -310,6 +325,20 @@ export const updateExpense = asyncHandler(
       calculatedParticipants,
     );
 
+    // Invalidate Next.js cache
+    const members = await prisma.groupMember.findMany({
+      where: { groupId },
+      select: { userId: true },
+    });
+    const memberUserIds = members.map((m) => m.userId);
+    const tagsToInvalidate = [
+      `expense-${id}`,
+      `group-expenses-${groupId}`,
+      `group-balances-${groupId}`,
+      ...memberUserIds.flatMap((id) => [`user-summary-${id}`]),
+    ];
+    invalidateCache(tagsToInvalidate);
+
     if (io) {
       io.to(`group:${groupId}`).emit("balance_update", { groupId });
     }
@@ -344,11 +373,25 @@ export const deleteExpense = asyncHandler(
       );
     }
 
+    const groupId = existingExpense.groupId;
     await ExpensesRepository.deleteExpense(id);
 
+    // Invalidate Next.js cache
+    const members = await prisma.groupMember.findMany({
+      where: { groupId },
+      select: { userId: true },
+    });
+    const memberUserIds = members.map((m) => m.userId);
+    const tagsToInvalidate = [
+      `group-expenses-${groupId}`,
+      `group-balances-${groupId}`,
+      ...memberUserIds.flatMap((id) => [`user-summary-${id}`]),
+    ];
+    invalidateCache(tagsToInvalidate);
+
     if (io) {
-      io.to(`group:${existingExpense.groupId}`).emit("balance_update", {
-        groupId: existingExpense.groupId,
+      io.to(`group:${groupId}`).emit("balance_update", {
+        groupId,
       });
     }
 

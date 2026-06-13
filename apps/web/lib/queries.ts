@@ -34,7 +34,9 @@ export async function getGroupBalances(groupId: string) {
     prisma.groupMember.findMany({
       where: { groupId },
       include: {
-        user: { select: { id: true, name: true, email: true, avatarUrl: true } },
+        user: {
+          select: { id: true, name: true, email: true, avatarUrl: true },
+        },
       },
     }),
     prisma.expense.findMany({
@@ -92,9 +94,17 @@ export async function getGroupBalances(groupId: string) {
       if (!u1 || !u2) continue;
       const net = (debts[u1]?.[u2] || 0) - (debts[u2]?.[u1] || 0);
       if (net > 0 && memberMap.get(u1) && memberMap.get(u2)) {
-        pairwiseDebts.push({ fromUser: memberMap.get(u1), toUser: memberMap.get(u2), amount: net });
+        pairwiseDebts.push({
+          fromUser: memberMap.get(u1),
+          toUser: memberMap.get(u2),
+          amount: net,
+        });
       } else if (net < 0 && memberMap.get(u1) && memberMap.get(u2)) {
-        pairwiseDebts.push({ fromUser: memberMap.get(u2), toUser: memberMap.get(u1), amount: -net });
+        pairwiseDebts.push({
+          fromUser: memberMap.get(u2),
+          toUser: memberMap.get(u1),
+          amount: -net,
+        });
       }
     }
   }

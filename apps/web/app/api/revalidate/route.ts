@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     const { tags } = await req.json();
     if (tags && Array.isArray(tags)) {
       for (const tag of tags) {
-        revalidateTag(tag);
+        revalidateTag(tag, "default");
       }
     }
     return NextResponse.json({ success: true });
