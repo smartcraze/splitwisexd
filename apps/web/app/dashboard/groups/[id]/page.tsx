@@ -20,6 +20,48 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth-context";
 import { fetchApi } from "@/lib/api";
 
+const getGroupTheme = (name: string, desc = "") => {
+  const text = `${name} ${desc}`.toLowerCase();
+  if (/home|flat|electricity|rent|house|room|roommate|stay|apart/i.test(text)) {
+    return {
+      name: "Flat group",
+      image:
+        "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&auto=format&fit=crop&q=80",
+      kanji: "家",
+    };
+  }
+  if (
+    /dinner|food|restaurant|ramen|sushi|cafe|party|lunch|drink|pub|bar/i.test(
+      text,
+    )
+  ) {
+    return {
+      name: "Food group",
+      image:
+        "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=1200&auto=format&fit=crop&q=80",
+      kanji: "食",
+    };
+  }
+  if (
+    /trip|travel|vacation|dollar|USD|outing|gate|trek|flight|train|bus|car|mountain/i.test(
+      text,
+    )
+  ) {
+    return {
+      name: "Travel group",
+      image:
+        "https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=1200&auto=format&fit=crop&q=80",
+      kanji: "旅",
+    };
+  }
+  return {
+    name: "General group",
+    image:
+      "https://images.unsplash.com/photo-1512427691650-15fcce1dc7b1?w=1200&auto=format&fit=crop&q=80",
+    kanji: "倶",
+  };
+};
+
 export default function GroupPage({
   params,
 }: {
@@ -81,43 +123,108 @@ export default function GroupPage({
     );
   }
 
+  const theme = getGroupTheme(group.name, group.description || "");
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
-          >
-            <IconChevronLeft size={14} /> Back to Dashboard
-          </Link>
-          <h1 className="text-3xl font-extrabold tracking-tight">
-            {group.name}
-          </h1>
-          <p className="text-sm text-muted-foreground">{group.description}</p>
+      {/* Breadcrumb */}
+      <Link
+        href="/dashboard"
+        className="inline-flex items-center gap-1 text-xs font-bold text-muted-foreground hover:text-primary transition-colors"
+      >
+        <IconChevronLeft size={14} /> Back to Dashboard
+      </Link>
+
+      {/* Immersive Theme Header Banner */}
+      <div className="relative rounded-3xl overflow-hidden border border-border/80 shadow-md">
+        <div className="relative h-48 sm:h-56 w-full bg-muted overflow-hidden">
+          <img
+            src={theme.image}
+            alt={group.name}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+
+          {/* Hanko Stamp Signature overlay */}
+          <div className="absolute top-4 right-4 rotate-[-8deg] select-none scale-110">
+            <svg
+              width="38"
+              height="38"
+              viewBox="0 0 34 34"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="17"
+                cy="17"
+                r="14"
+                stroke="var(--crimson)"
+                strokeWidth="1.8"
+                strokeDasharray="30 1 12 0.5 20 1"
+                className="opacity-95"
+              />
+              <circle
+                cx="17"
+                cy="17"
+                r="11"
+                stroke="var(--crimson)"
+                strokeWidth="0.8"
+                className="opacity-80"
+              />
+              <text
+                x="17"
+                y="21"
+                fill="var(--crimson)"
+                fontSize="9"
+                fontWeight="950"
+                textAnchor="middle"
+                style={{ fontFamily: "'Noto Serif JP', serif" }}
+              >
+                {theme.kanji}
+              </text>
+            </svg>
+          </div>
+
+          {/* Group Details Text */}
+          <div className="absolute bottom-6 left-6 right-6 text-white space-y-1.5">
+            <span className="text-[10px] uppercase tracking-wider font-mono font-bold bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/20">
+              {theme.name}
+            </span>
+            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight truncate">
+              {group.name}
+            </h1>
+            <p className="text-xs sm:text-sm text-white/80 max-w-xl truncate">
+              {group.description || "Shared expense group"} &bull;{" "}
+              {group.members.length} members
+            </p>
+          </div>
         </div>
+      </div>
+
+      {/* Actions & Buttons Row */}
+      <div className="flex flex-wrap items-center justify-between gap-4 pt-1">
         <div className="flex flex-wrap gap-2">
           <Link href={`/dashboard/groups/${groupId}/import`}>
             <Button
               variant="outline"
-              className="cursor-pointer border-border font-bold text-xs"
+              className="cursor-pointer border-border font-bold text-xs rounded-xl bg-card hover:bg-muted"
             >
-              <IconUpload size={16} className="mr-1" /> Import CSV
+              <IconUpload size={16} className="mr-1 text-primary" /> Import CSV
             </Button>
           </Link>
           <Button
             onClick={() => setSettleOpen(true)}
             variant="outline"
-            className="cursor-pointer border-border font-bold text-xs"
+            className="cursor-pointer border-border font-bold text-xs rounded-xl bg-card hover:bg-muted"
           >
-            <IconWallet size={16} className="mr-1" /> Settle Up
+            <IconWallet size={16} className="mr-1 text-emerald-500" /> Settle Up
           </Button>
           <Button
             onClick={() => {
               setEditExpense(null);
               setExpenseOpen(true);
             }}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs cursor-pointer"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs cursor-pointer rounded-xl"
           >
             <IconPlus size={16} className="mr-1" /> Add Expense
           </Button>

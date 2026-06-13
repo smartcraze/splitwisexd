@@ -36,6 +36,12 @@
       "sourceType": "github",
       "skillPath": "skills/security-reviewer/SKILL.md",
       "computedHash": "cca56045dd49c756546d74d46034c91be2159875e358050d40c7d1905700e8fd"
+    },
+    "theme-factory": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/theme-factory/SKILL.md",
+      "computedHash": "e9ec1fe85faa729e9f3d1731cd7e4e485f98c099ccc7c1c0d198f473aa4b654a"
     }
   }
 }
