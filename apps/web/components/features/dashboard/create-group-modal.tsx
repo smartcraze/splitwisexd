@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
 
-export function CreateGroupModal({ onGroupCreated }: { onGroupCreated: () => void }) {
+export function CreateGroupModal({ onGroupCreated }: { onGroupCreated?: () => void }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -48,7 +48,7 @@ export function CreateGroupModal({ onGroupCreated }: { onGroupCreated: () => voi
       setName("");
       setDescription("");
       setMemberEmails([]);
-      onGroupCreated();
+      onGroupCreated?.();
       setOpen(false);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to create group");
