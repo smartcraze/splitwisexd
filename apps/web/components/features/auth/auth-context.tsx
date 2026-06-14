@@ -24,7 +24,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => void | Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -72,6 +72,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async function loadUser() {
       const storedToken = localStorage.getItem("token");
       if (storedToken) {
+        // Sync cookie to server-side session securely
+        await fetch("/api/auth/session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: storedToken }),
+        }).catch(console.error);
+
         setToken(storedToken);
         try {
           const userData = await api.getMe();
@@ -79,6 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch (error) {
           console.error("Failed to load user:", error);
           localStorage.removeItem("token");
+          await fetch("/api/auth/session", { method: "DELETE" }).catch(console.error);
           setToken(null);
           setUser(null);
         }
@@ -91,7 +99,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     const data = await api.login({ email, password });
     localStorage.setItem("token", data.token);
-    document.cookie = `token=${data.token}; path=/; max-age=604800; SameSite=Lax`;
+    
+    // Set cookie securely via server-side route
+    await fetch("/api/auth/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: data.token }),
+    });
+
     setToken(data.token);
     setUser(data.user);
     router.replace("/dashboard");
@@ -100,15 +115,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (name: string, email: string, password: string) => {
     const data = await api.register({ name, email, password });
     localStorage.setItem("token", data.token);
-    document.cookie = `token=${data.token}; path=/; max-age=604800; SameSite=Lax`;
+    
+    // Set cookie securely via server-side route
+    await fetch("/api/auth/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: data.token }),
+    });
+
     setToken(data.token);
     setUser(data.user);
     router.replace("/dashboard");
   };
 
-  const logout = () => {
+  const logout = async () => {
     localStorage.removeItem("token");
-    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    
+    // Clear cookie securely via server-side route
+    await fetch("/api/auth/session", { method: "DELETE" }).catch(console.error);
+
     setToken(null);
     setUser(null);
     router.replace("/login");

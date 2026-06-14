@@ -116,4 +116,10 @@ export const api = {
     request<any[]>("/comments", { method: "GET", params: { expenseId } }),
   createComment: (body: any) =>
     request<any>("/comments", { method: "POST", body: JSON.stringify(body) }),
+
+  importGroupData: (groupId: string, body: any) =>
+    request<any>(`/groups/${groupId}/import`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
 };

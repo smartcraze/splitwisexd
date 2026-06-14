@@ -24,7 +24,7 @@ export function GroupHeader({
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <Link
-            href="/"
+            href="/dashboard"
             className="p-1 rounded-lg hover:bg-muted text-muted-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />

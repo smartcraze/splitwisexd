@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -51,7 +51,9 @@ export function SettleUpDialog({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const eligibleRecipients = members.filter((m) => m.user.id !== currentUserId);
+  const eligibleRecipients = useMemo(() => {
+    return members.filter((m) => m.user.id !== currentUserId);
+  }, [members, currentUserId]);
 
   useEffect(() => {
     if (open) {

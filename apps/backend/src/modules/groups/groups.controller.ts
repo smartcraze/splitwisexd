@@ -296,3 +296,133 @@ export const getUserSummary = asyncHandler(
     res.json(ApiResponse.success("User summary fetched successfully", result));
   },
 );
+
+export const importGroupData = asyncHandler(
+  async (req: Request, res: Response) => {
+    const authReq = req as AuthRequest;
+    if (!authReq.user) {
+      throw new AppError("Not authenticated", 401);
+    }
+
+    const groupId = authReq.params.id as string;
+    const membership = await GroupsRepository.findMembership(
+      groupId,
+      authReq.user.id,
+    );
+    if (!membership) {
+      throw new AppError(
+        "Access denied. You are not a member of this group.",
+        403,
+      );
+    }
+
+    const { expenses, settlements } = req.body;
+    const creatorId = authReq.user.id;
+
+    // Fetch group members to validate references
+    const groupMembers = await prisma.groupMember.findMany({
+      where: { groupId },
+      select: { userId: true },
+    });
+    const memberSet = new Set(groupMembers.map((m) => m.userId));
+
+    // Validate referenced user IDs
+    if (expenses && Array.isArray(expenses)) {
+      for (const e of expenses) {
+        if (!memberSet.has(e.paidByUserId)) {
+          throw new AppError(`Payer ${e.paidByUserId} is not a member of this group.`, 400);
+        }
+        if (!e.participants || !Array.isArray(e.participants) || e.participants.length === 0) {
+          throw new AppError(`Expense "${e.title}" must have at least one participant.`, 400);
+        }
+        for (const p of e.participants) {
+          if (!memberSet.has(p.userId)) {
+            throw new AppError(`Participant ${p.userId} is not a member of this group.`, 400);
+          }
+        }
+      }
+    }
+
+    if (settlements && Array.isArray(settlements)) {
+      for (const s of settlements) {
+        if (!memberSet.has(s.paidByUserId)) {
+          throw new AppError(`Settlement sender ${s.paidByUserId} is not a member of this group.`, 400);
+        }
+        if (!memberSet.has(s.paidToUserId)) {
+          throw new AppError(`Settlement receiver ${s.paidToUserId} is not a member of this group.`, 400);
+        }
+      }
+    }
+
+    // Insert everything inside a transaction
+    const result = await prisma.$transaction(async (tx) => {
+      const createdExpenses = [];
+      const createdSettlements = [];
+
+      if (expenses && Array.isArray(expenses)) {
+        for (const e of expenses) {
+          const exp = await tx.expense.create({
+            data: {
+              title: e.title,
+              description: e.description || null,
+              totalAmount: e.totalAmount,
+              splitMethod: e.splitMethod,
+              groupId,
+              paidByUserId: e.paidByUserId,
+              createdById: creatorId,
+              createdAt: e.createdAt ? new Date(e.createdAt) : new Date(),
+            },
+          });
+
+          await tx.expenseParticipant.createMany({
+            data: e.participants.map((p: any) => ({
+              expenseId: exp.id,
+              userId: p.userId,
+              owedAmount: p.owedAmount,
+              percentage: p.percentage || null,
+              shares: p.shares || null,
+            })),
+          });
+
+          createdExpenses.push(exp);
+        }
+      }
+
+      if (settlements && Array.isArray(settlements)) {
+        for (const s of settlements) {
+          const sett = await tx.settlement.create({
+            data: {
+              groupId,
+              paidByUserId: s.paidByUserId,
+              paidToUserId: s.paidToUserId,
+              amount: s.amount,
+              note: s.note || null,
+              status: "COMPLETED",
+              createdAt: s.createdAt ? new Date(s.createdAt) : new Date(),
+            },
+          });
+          createdSettlements.push(sett);
+        }
+      }
+
+      return { expensesCount: createdExpenses.length, settlementsCount: createdSettlements.length };
+    });
+
+    // Invalidate caches
+    const memberUserIds = Array.from(memberSet);
+    const tagsToInvalidate = [
+      `group-expenses-${groupId}`,
+      `group-settlements-${groupId}`,
+      `group-balances-${groupId}`,
+      ...memberUserIds.flatMap((id) => [`user-summary-${id}`]),
+    ];
+    invalidateCache(tagsToInvalidate);
+
+    if (io) {
+      io.to(`group:${groupId}`).emit("balance_update", { groupId });
+    }
+
+    res.status(201).json(ApiResponse.success("Data imported successfully", result));
+  }
+);
+
