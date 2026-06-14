@@ -1,10 +1,10 @@
-import type { Request, Response } from "express";
 import { prisma } from "@repo/db";
+import type { Request, Response } from "express";
 import { ApiResponse } from "../../lib/api-response.ts";
 import { AppError } from "../../lib/app-error.ts";
 import { asyncHandler } from "../../lib/async-handler.ts";
-import { io } from "../../lib/socket.ts";
 import { invalidateCache } from "../../lib/cache.ts";
+import { io } from "../../lib/socket.ts";
 import type { AuthRequest } from "../../middleware/auth.ts";
 import { GroupsRepository } from "./groups.repository.ts";
 import { addMemberSchema, createGroupSchema } from "./groups.schemas.ts";
@@ -296,4 +296,3 @@ export const getUserSummary = asyncHandler(
     res.json(ApiResponse.success("User summary fetched successfully", result));
   },
 );
-

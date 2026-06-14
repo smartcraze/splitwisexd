@@ -28,12 +28,18 @@ export function LandingFooter() {
           </h4>
           <ul className="space-y-3 text-sm text-zinc-500">
             <li>
-              <a href="#features" className="hover:text-zinc-900 transition-colors">
+              <a
+                href="#features"
+                className="hover:text-zinc-900 transition-colors"
+              >
                 Features
               </a>
             </li>
             <li>
-              <a href="#how-it-works" className="hover:text-zinc-900 transition-colors">
+              <a
+                href="#how-it-works"
+                className="hover:text-zinc-900 transition-colors"
+              >
                 Workflow
               </a>
             </li>
@@ -46,12 +52,18 @@ export function LandingFooter() {
           </h4>
           <ul className="space-y-3 text-sm text-zinc-500">
             <li>
-              <Link href="/login" className="hover:text-zinc-900 transition-colors">
+              <Link
+                href="/login"
+                className="hover:text-zinc-900 transition-colors"
+              >
                 Login
               </Link>
             </li>
             <li>
-              <Link href="/register" className="hover:text-zinc-900 transition-colors">
+              <Link
+                href="/register"
+                className="hover:text-zinc-900 transition-colors"
+              >
                 Register
               </Link>
             </li>

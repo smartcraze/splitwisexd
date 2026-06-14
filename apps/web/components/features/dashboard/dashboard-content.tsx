@@ -36,7 +36,10 @@ export function DashboardContent({
   const totalSpend = summary.youOwe + summary.youAreOwed;
 
   const [settleOpen, setSettleOpen] = useState(false);
-  const [settlePrefill, setSettlePrefill] = useState<{ paidToUserId: string; amount: number } | null>(null);
+  const [settlePrefill, setSettlePrefill] = useState<{
+    paidToUserId: string;
+    amount: number;
+  } | null>(null);
   const [settleGroupId, setSettleGroupId] = useState<string>("");
 
   const handleGroupCreated = () => {
@@ -104,7 +107,9 @@ export function DashboardContent({
               debts={allDebts}
               currentUserId={user.id}
               onSettle={handleSettleClick}
-              onRemind={(debt) => alert(`Reminder sent to ${debt.fromUser.name}!`)}
+              onRemind={(debt) =>
+                alert(`Reminder sent to ${debt.fromUser.name}!`)
+              }
             />
           )}
           <SpendingChart totalAmount={totalSpend} />

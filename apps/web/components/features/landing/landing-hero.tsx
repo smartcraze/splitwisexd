@@ -14,7 +14,6 @@ export function LandingHero() {
     <section className="relative z-10 max-w-7xl mx-auto px-6 pt-20 md:pt-28 pb-20 grid gap-16 lg:grid-cols-12 items-center">
       {/* Left Side */}
       <div className="lg:col-span-5 space-y-8 text-center lg:text-left">
-
         {/* Eyebrow */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -85,8 +84,12 @@ export function LandingHero() {
           ].map((stat, i) => (
             <div key={stat.label} className="flex items-center gap-8">
               <div className="text-center">
-                <p className="text-2xl font-black text-zinc-900 leading-none">{stat.value}</p>
-                <p className="text-xs text-zinc-400 font-semibold mt-1 uppercase tracking-wide">{stat.label}</p>
+                <p className="text-2xl font-black text-zinc-900 leading-none">
+                  {stat.value}
+                </p>
+                <p className="text-xs text-zinc-400 font-semibold mt-1 uppercase tracking-wide">
+                  {stat.label}
+                </p>
               </div>
               {i < 2 && <div className="h-8 w-px bg-zinc-150" />}
             </div>

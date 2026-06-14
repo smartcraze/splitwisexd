@@ -16,8 +16,12 @@ export function LandingTrustedBy() {
           {highlights.map((h, i) => (
             <div key={h.label} className="flex items-center gap-12 md:gap-20">
               <div className="text-center">
-                <p className="text-3xl font-black text-zinc-900 leading-none">{h.value}</p>
-                <p className="text-[11px] text-zinc-400 font-semibold mt-1.5 uppercase tracking-widest">{h.label}</p>
+                <p className="text-3xl font-black text-zinc-900 leading-none">
+                  {h.value}
+                </p>
+                <p className="text-[11px] text-zinc-400 font-semibold mt-1.5 uppercase tracking-widest">
+                  {h.label}
+                </p>
               </div>
               {i < highlights.length - 1 && (
                 <div className="hidden sm:block h-10 w-px bg-zinc-200" />

@@ -1,16 +1,29 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import {
+  AlertTriangle,
+  ArrowRight,
+  Calendar,
+  CheckCircle,
+  DollarSign,
+  HelpCircle,
+  Info,
+  TrendingDown,
+  Upload,
+  XCircle,
+} from "lucide-react";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -19,18 +32,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Upload,
-  AlertTriangle,
-  CheckCircle,
-  HelpCircle,
-  XCircle,
-  Info,
-  DollarSign,
-  ArrowRight,
-  TrendingDown,
-  Calendar,
-} from "lucide-react";
 import { api } from "@/lib/api";
 
 interface CSVImportDialogProps {
@@ -63,7 +64,7 @@ interface ParsedRow {
   isSettlement: boolean;
   isRefund: boolean; // negative amount
   splitMethod: "EQUAL" | "UNEQUAL" | "PERCENTAGE" | "SHARES";
-  
+
   // Mapped entities
   paidByUserId: string | null; // null if unmapped
   participants: {
@@ -93,7 +94,9 @@ export function CSVImportDialog({
   onOpenChange,
   onImportComplete,
 }: CSVImportDialogProps) {
-  const [step, setStep] = useState<"upload" | "review" | "importing" | "success">("upload");
+  const [step, setStep] = useState<
+    "upload" | "review" | "importing" | "success"
+  >("upload");
   const [csvFile, setCSVFile] = useState<File | null>(null);
   const [usdRate, setUsdRate] = useState<number>(83);
   const [parsedRows, setParsedRows] = useState<ParsedRow[]>([]);
@@ -111,7 +114,7 @@ export function CSVImportDialog({
     return members.find(
       (m) =>
         normalizeName(m.user.name) === norm ||
-        normalizeName(m.user.email.split("@")[0] || "") === norm
+        normalizeName(m.user.email.split("@")[0] || "") === norm,
     );
   };
 
@@ -119,7 +122,8 @@ export function CSVImportDialog({
   useEffect(() => {
     if (rawCSVText) {
       setErrorMsg(null);
-      api.parseCSV(groupId, rawCSVText, usdRate)
+      api
+        .parseCSV(groupId, rawCSVText, usdRate)
         .then((res) => {
           const parsed = res.map((r: any) => ({
             ...r,
@@ -152,16 +156,16 @@ export function CSVImportDialog({
     setParsedRows((prev) =>
       prev.map((row) => {
         if (row.index !== rowIndex) return row;
-        
+
         // Remove the "Unknown Group Payer" anomaly if matched
         const cleanAnomalies = row.anomalies.filter((a) => a.id !== 12);
-        
+
         return {
           ...row,
           paidByUserId: userId,
           anomalies: cleanAnomalies,
         };
-      })
+      }),
     );
   };
 
@@ -171,7 +175,7 @@ export function CSVImportDialog({
         if (row.index !== rowIndex) return row;
         if (row.skipped) return row; // cannot approve skipped zero amount rows
         return { ...row, approved: !row.approved };
-      })
+      }),
     );
   };
 
@@ -180,16 +184,18 @@ export function CSVImportDialog({
       prev.map((row) => {
         if (row.index !== rowIndex) return row;
         return { ...row, isSettlement: !row.isSettlement };
-      })
+      }),
     );
   };
 
   const handleImportSubmit = async () => {
     const approvedRows = parsedRows.filter((r) => r.approved && !r.skipped);
     const unmappedPayer = approvedRows.find((r) => !r.paidByUserId);
-    
+
     if (unmappedPayer) {
-      alert(`Row ${unmappedPayer.index + 1} ("${unmappedPayer.title}") does not have a mapped payer. Please select a group member.`);
+      alert(
+        `Row ${unmappedPayer.index + 1} ("${unmappedPayer.title}") does not have a mapped payer. Please select a group member.`,
+      );
       return;
     }
 
@@ -214,7 +220,9 @@ export function CSVImportDialog({
           }
 
           if (row.paidByUserId === paidToUserId) {
-            const otherMember = members.find((m) => m.userId !== row.paidByUserId);
+            const otherMember = members.find(
+              (m) => m.userId !== row.paidByUserId,
+            );
             paidToUserId = otherMember ? otherMember.userId : paidToUserId;
           }
 
@@ -228,7 +236,7 @@ export function CSVImportDialog({
         } else if (row.isRefund) {
           // Anomaly 6: Refund record splits reversed
           const originalPayerId = row.paidByUserId!;
-          
+
           for (const p of row.participants) {
             if (p.userId === originalPayerId) continue;
 
@@ -284,20 +292,28 @@ export function CSVImportDialog({
   };
 
   const getSeverityBadgeClass = (severity: string) => {
-    if (severity === "error") return "bg-destructive/10 text-destructive border-destructive/20";
-    if (severity === "warning") return "bg-amber-500/10 text-amber-500 border-amber-500/20";
+    if (severity === "error")
+      return "bg-destructive/10 text-destructive border-destructive/20";
+    if (severity === "warning")
+      return "bg-amber-500/10 text-amber-500 border-amber-500/20";
     return "bg-blue-500/10 text-blue-500 border-blue-500/20";
   };
 
   return (
-    <Dialog open={open} onOpenChange={(val) => { if (!val) handleClose(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(val) => {
+        if (!val) handleClose();
+      }}
+    >
       <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col p-6 rounded-2xl border border-border shadow-2xl bg-card text-card-foreground">
         <DialogHeader className="pb-3 border-b border-border">
           <DialogTitle className="text-2xl font-extrabold tracking-tight">
             Import Expenses from CSV
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
-            Upload your `Expenses Export.csv` to run the anomaly engine, resolve data conflicts, and import them.
+            Upload your `Expenses Export.csv` to run the anomaly engine, resolve
+            data conflicts, and import them.
           </DialogDescription>
         </DialogHeader>
 
@@ -324,7 +340,8 @@ export function CSVImportDialog({
                 Click or drag your CSV file here to import
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Only CSV format exports containing dates, descriptions, payers, and amounts are supported.
+                Only CSV format exports containing dates, descriptions, payers,
+                and amounts are supported.
               </p>
             </div>
           )}
@@ -339,7 +356,8 @@ export function CSVImportDialog({
                     USD Exchange Rate Configuration
                   </h4>
                   <p className="text-xs text-muted-foreground">
-                    Customize the conversion rate used for any USD-denominated expenses in the CSV.
+                    Customize the conversion rate used for any USD-denominated
+                    expenses in the CSV.
                   </p>
                 </div>
                 <div className="flex items-center gap-2 w-full md:w-auto">
@@ -349,7 +367,9 @@ export function CSVImportDialog({
                   <Input
                     type="number"
                     value={usdRate}
-                    onChange={(e) => setUsdRate(Math.max(1, parseFloat(e.target.value) || 0))}
+                    onChange={(e) =>
+                      setUsdRate(Math.max(1, parseFloat(e.target.value) || 0))
+                    }
                     className="w-24 bg-background border-border text-foreground text-center font-bold"
                   />
                   <span className="text-xs font-bold text-foreground">INR</span>
@@ -359,7 +379,9 @@ export function CSVImportDialog({
               {/* Parsed Rows List */}
               <div className="space-y-3">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground/80">
-                  Review & Approve Rows ({parsedRows.filter(r => r.approved && !r.skipped).length} of {parsedRows.filter(r => !r.skipped).length} approved)
+                  Review & Approve Rows (
+                  {parsedRows.filter((r) => r.approved && !r.skipped).length} of{" "}
+                  {parsedRows.filter((r) => !r.skipped).length} approved)
                 </h3>
 
                 <div className="space-y-4">
@@ -372,10 +394,10 @@ export function CSVImportDialog({
                           row.skipped
                             ? "bg-muted/20 border-muted-foreground/15 opacity-60"
                             : row.approved
-                            ? "bg-card border-border hover:border-primary/30"
-                            : isDuplicate
-                            ? "bg-amber-500/[0.03] border-amber-500/20"
-                            : "bg-muted/10 border-border opacity-75"
+                              ? "bg-card border-border hover:border-primary/30"
+                              : isDuplicate
+                                ? "bg-amber-500/[0.03] border-amber-500/20"
+                                : "bg-muted/10 border-border opacity-75"
                         }`}
                       >
                         <div className="flex items-start gap-4">
@@ -404,7 +426,9 @@ export function CSVImportDialog({
                                   </span>
                                   <span>•</span>
                                   <span className="font-semibold text-foreground">
-                                    {row.isUSD ? `$${row.originalAmount} USD` : `₹${row.originalAmount} INR`}
+                                    {row.isUSD
+                                      ? `$${row.originalAmount} USD`
+                                      : `₹${row.originalAmount} INR`}
                                   </span>
                                   {row.isUSD && (
                                     <>
@@ -427,19 +451,32 @@ export function CSVImportDialog({
                                   Payer:
                                 </span>
                                 {row.paidByUserId ? (
-                                  <Badge variant="outline" className="font-bold bg-muted/40 border-border text-foreground">
-                                    {members.find((m) => m.userId === row.paidByUserId)?.user.name}
+                                  <Badge
+                                    variant="outline"
+                                    className="font-bold bg-muted/40 border-border text-foreground"
+                                  >
+                                    {
+                                      members.find(
+                                        (m) => m.userId === row.paidByUserId,
+                                      )?.user.name
+                                    }
                                   </Badge>
                                 ) : (
                                   <Select
-                                    onValueChange={(val) => handlePayerChange(row.index, val)}
+                                    onValueChange={(val) =>
+                                      handlePayerChange(row.index, val)
+                                    }
                                   >
                                     <SelectTrigger className="h-8 w-36 bg-background border-destructive text-destructive focus:ring-destructive font-bold text-xs">
                                       <SelectValue placeholder="Map Payer..." />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {members.map((m) => (
-                                        <SelectItem key={m.userId} value={m.userId} className="text-xs">
+                                        <SelectItem
+                                          key={m.userId}
+                                          value={m.userId}
+                                          className="text-xs"
+                                        >
                                           {m.user.name}
                                         </SelectItem>
                                       ))}
@@ -456,12 +493,14 @@ export function CSVImportDialog({
                                   <div
                                     key={anom.id}
                                     className={`px-3 py-1.5 rounded-lg border text-[11px] font-medium flex items-start gap-1.5 ${getSeverityBadgeClass(
-                                      anom.severity
+                                      anom.severity,
                                     )}`}
                                   >
                                     <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
                                     <div>
-                                      <span className="font-bold mr-1">{anom.type}:</span>
+                                      <span className="font-bold mr-1">
+                                        {anom.type}:
+                                      </span>
                                       {anom.message}
                                     </div>
                                   </div>
@@ -477,7 +516,9 @@ export function CSVImportDialog({
                                   <input
                                     type="checkbox"
                                     checked={row.isSettlement}
-                                    onChange={() => toggleIsSettlement(row.index)}
+                                    onChange={() =>
+                                      toggleIsSettlement(row.index)
+                                    }
                                     className="h-3.5 w-3.5 rounded border-border text-primary focus:ring-primary"
                                   />
                                   Import as Settlement record instead of Expense
@@ -489,18 +530,28 @@ export function CSVImportDialog({
                             {!row.skipped && row.participants.length > 0 && (
                               <div className="mt-2 bg-muted/40 border border-border/60 p-2.5 rounded-lg text-xs space-y-1.5">
                                 <p className="font-bold text-muted-foreground text-[10px] uppercase tracking-wider">
-                                  {row.isSettlement ? "Settlement Transfer Details" : row.isRefund ? "Refund Breakdown Preview (Reversed)" : "Expense Split Breakdown"}
+                                  {row.isSettlement
+                                    ? "Settlement Transfer Details"
+                                    : row.isRefund
+                                      ? "Refund Breakdown Preview (Reversed)"
+                                      : "Expense Split Breakdown"}
                                 </p>
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                   {row.isSettlement ? (
                                     <div className="col-span-4 flex items-center gap-2">
                                       <span className="font-semibold text-foreground">
-                                        {members.find((m) => m.userId === row.paidByUserId)?.user.name || "Unknown"}
+                                        {members.find(
+                                          (m) => m.userId === row.paidByUserId,
+                                        )?.user.name || "Unknown"}
                                       </span>
                                       <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
                                       <span className="font-semibold text-foreground">
-                                        {members.find((m) => m.userId === (row.participants[0]?.userId || ""))?.user.name || 
-                                         row.originalSplitWith.split(";")[0]}
+                                        {members.find(
+                                          (m) =>
+                                            m.userId ===
+                                            (row.participants[0]?.userId || ""),
+                                        )?.user.name ||
+                                          row.originalSplitWith.split(";")[0]}
                                       </span>
                                       <span className="ml-auto font-bold text-foreground">
                                         ₹{Math.round(row.amount / 100)}
@@ -508,26 +559,49 @@ export function CSVImportDialog({
                                     </div>
                                   ) : row.isRefund ? (
                                     row.participants.map((p) => {
-                                      if (p.userId === row.paidByUserId) return null;
+                                      if (p.userId === row.paidByUserId)
+                                        return null;
                                       return (
-                                        <div key={p.userId} className="flex justify-between border-b border-border/40 pb-0.5">
+                                        <div
+                                          key={p.userId}
+                                          className="flex justify-between border-b border-border/40 pb-0.5"
+                                        >
                                           <span className="text-muted-foreground truncate">
-                                            {members.find((m) => m.userId === p.userId)?.user.name}:
+                                            {
+                                              members.find(
+                                                (m) => m.userId === p.userId,
+                                              )?.user.name
+                                            }
+                                            :
                                           </span>
                                           <span className="font-semibold text-amber-500">
-                                            -₹{((p.owedAmount || 0) / 100).toFixed(2)}
+                                            -₹
+                                            {(
+                                              (p.owedAmount || 0) / 100
+                                            ).toFixed(2)}
                                           </span>
                                         </div>
                                       );
                                     })
                                   ) : (
                                     row.participants.map((p) => (
-                                      <div key={p.userId} className="flex justify-between border-b border-border/40 pb-0.5">
+                                      <div
+                                        key={p.userId}
+                                        className="flex justify-between border-b border-border/40 pb-0.5"
+                                      >
                                         <span className="text-muted-foreground truncate">
-                                          {members.find((m) => m.userId === p.userId)?.user.name}:
+                                          {
+                                            members.find(
+                                              (m) => m.userId === p.userId,
+                                            )?.user.name
+                                          }
+                                          :
                                         </span>
                                         <span className="font-bold text-foreground">
-                                          ₹{((p.owedAmount || 0) / 100).toFixed(2)}
+                                          ₹
+                                          {((p.owedAmount || 0) / 100).toFixed(
+                                            2,
+                                          )}
                                         </span>
                                       </div>
                                     ))
@@ -554,7 +628,8 @@ export function CSVImportDialog({
                 Importing data...
               </p>
               <p className="text-xs text-muted-foreground">
-                Persisting your approved expenses and settlements to the database.
+                Persisting your approved expenses and settlements to the
+                database.
               </p>
             </div>
           )}
@@ -571,10 +646,18 @@ export function CSVImportDialog({
                 Successfully processed and recorded all selected CSV items.
               </p>
               <div className="bg-muted border border-border p-4 rounded-xl inline-grid grid-cols-2 gap-x-6 gap-y-1 text-sm font-bold">
-                <span className="text-muted-foreground text-left">Expenses Imported:</span>
-                <span className="text-foreground text-right">{importResult.expensesCount}</span>
-                <span className="text-muted-foreground text-left">Settlements Recorded:</span>
-                <span className="text-foreground text-right">{importResult.settlementsCount}</span>
+                <span className="text-muted-foreground text-left">
+                  Expenses Imported:
+                </span>
+                <span className="text-foreground text-right">
+                  {importResult.expensesCount}
+                </span>
+                <span className="text-muted-foreground text-left">
+                  Settlements Recorded:
+                </span>
+                <span className="text-foreground text-right">
+                  {importResult.settlementsCount}
+                </span>
               </div>
               <Button onClick={handleClose} className="mt-4">
                 Done & Close
@@ -595,10 +678,14 @@ export function CSVImportDialog({
               </Button>
               <Button
                 onClick={handleImportSubmit}
-                disabled={parsedRows.filter((r) => r.approved && !r.skipped).length === 0}
+                disabled={
+                  parsedRows.filter((r) => r.approved && !r.skipped).length ===
+                  0
+                }
                 className="bg-primary text-primary-foreground font-semibold hover:bg-primary/90 ml-auto"
               >
-                Import Approved ({parsedRows.filter((r) => r.approved && !r.skipped).length})
+                Import Approved (
+                {parsedRows.filter((r) => r.approved && !r.skipped).length})
               </Button>
             </>
           )}

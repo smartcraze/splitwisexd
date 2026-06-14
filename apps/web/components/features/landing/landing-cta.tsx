@@ -14,7 +14,8 @@ export function LandingCTA() {
 
       <div className="max-w-4xl mx-auto px-6 text-center space-y-8 relative z-10">
         <h2 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter text-zinc-900 leading-[0.95]">
-          Start splitting<br />
+          Start splitting
+          <br />
           <span className="bg-gradient-to-r from-primary to-rose-500 bg-clip-text text-transparent">
             smarter today.
           </span>
@@ -30,7 +31,10 @@ export function LandingCTA() {
             </Button>
           </Link>
           <Link href="/login">
-            <Button variant="outline" className="border-zinc-200 text-zinc-600 hover:border-zinc-300 font-bold text-base px-10 py-6 rounded-xl">
+            <Button
+              variant="outline"
+              className="border-zinc-200 text-zinc-600 hover:border-zinc-300 font-bold text-base px-10 py-6 rounded-xl"
+            >
               Sign In
             </Button>
           </Link>

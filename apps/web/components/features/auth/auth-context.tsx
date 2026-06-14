@@ -86,7 +86,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch (error) {
           console.error("Failed to load user:", error);
           localStorage.removeItem("token");
-          await fetch("/api/auth/session", { method: "DELETE" }).catch(console.error);
+          await fetch("/api/auth/session", { method: "DELETE" }).catch(
+            console.error,
+          );
           setToken(null);
           setUser(null);
         }
@@ -99,7 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     const data = await api.login({ email, password });
     localStorage.setItem("token", data.token);
-    
+
     // Set cookie securely via server-side route
     await fetch("/api/auth/session", {
       method: "POST",
@@ -115,7 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (name: string, email: string, password: string) => {
     const data = await api.register({ name, email, password });
     localStorage.setItem("token", data.token);
-    
+
     // Set cookie securely via server-side route
     await fetch("/api/auth/session", {
       method: "POST",
@@ -130,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     localStorage.removeItem("token");
-    
+
     // Clear cookie securely via server-side route
     await fetch("/api/auth/session", { method: "DELETE" }).catch(console.error);
 

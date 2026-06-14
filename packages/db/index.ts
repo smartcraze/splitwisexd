@@ -6,7 +6,10 @@ const connectionString = `${process.env.DATABASE_URL}`;
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({
   adapter,
-  log: ["query", "info", "warn", "error"],
+  log:
+    process.env.NODE_ENV === "development"
+      ? ["query", "info", "warn", "error"]
+      : ["warn", "error"],
 });
 
 export * from "./generated/prisma/client";

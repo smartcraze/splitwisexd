@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { ExpenseFormDialog } from "@/components/features/expenses/expense-form-dialog";
 import { ExpenseList } from "@/components/features/expenses/expense-list";
 import { AddMemberDialog } from "@/components/features/groups/add-member-dialog";
+import { CSVImportDialog } from "@/components/features/groups/csv-import-dialog";
 import { DebtVisualizer } from "@/components/features/groups/debt-visualizer";
 import { GroupHeader } from "@/components/features/groups/group-header";
 import { GroupMembers } from "@/components/features/groups/group-members";
@@ -13,7 +14,6 @@ import { SettlementsList } from "@/components/features/settlements/settlements-l
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
 import { useSocket } from "@/lib/socket";
-import { CSVImportDialog } from "@/components/features/groups/csv-import-dialog";
 
 interface GroupPageContentProps {
   groupId: string;
@@ -109,7 +109,11 @@ export function GroupPageContent({
     // Format expenses
     for (const e of expenses) {
       const splitWithNames = e.participants
-        .map((p: any) => p.user?.name || group.members.find((m: any) => m.userId === p.userId)?.user?.name)
+        .map(
+          (p: any) =>
+            p.user?.name ||
+            group.members.find((m: any) => m.userId === p.userId)?.user?.name,
+        )
         .filter(Boolean)
         .join(";");
 
@@ -117,7 +121,11 @@ export function GroupPageContent({
       if (e.splitMethod === "UNEQUAL") {
         splitDetails = e.participants
           .map((p: any) => {
-            const name = p.user?.name || group.members.find((m: any) => m.userId === p.userId)?.user?.name || "";
+            const name =
+              p.user?.name ||
+              group.members.find((m: any) => m.userId === p.userId)?.user
+                ?.name ||
+              "";
             return `${name} ${p.owedAmount / 100}`;
           })
           .filter(Boolean)
@@ -125,7 +133,11 @@ export function GroupPageContent({
       } else if (e.splitMethod === "PERCENTAGE") {
         splitDetails = e.participants
           .map((p: any) => {
-            const name = p.user?.name || group.members.find((m: any) => m.userId === p.userId)?.user?.name || "";
+            const name =
+              p.user?.name ||
+              group.members.find((m: any) => m.userId === p.userId)?.user
+                ?.name ||
+              "";
             return `${name} ${p.percentage}%`;
           })
           .filter(Boolean)
@@ -133,7 +145,11 @@ export function GroupPageContent({
       } else if (e.splitMethod === "SHARES") {
         splitDetails = e.participants
           .map((p: any) => {
-            const name = p.user?.name || group.members.find((m: any) => m.userId === p.userId)?.user?.name || "";
+            const name =
+              p.user?.name ||
+              group.members.find((m: any) => m.userId === p.userId)?.user
+                ?.name ||
+              "";
             return `${name} ${p.shares}`;
           })
           .filter(Boolean)
@@ -148,7 +164,12 @@ export function GroupPageContent({
       rows.push([
         formatDate(e.createdAt),
         escapeCSV(e.title),
-        escapeCSV(e.paidBy?.name || group.members.find((m: any) => m.userId === e.paidByUserId)?.user?.name || ""),
+        escapeCSV(
+          e.paidBy?.name ||
+            group.members.find((m: any) => m.userId === e.paidByUserId)?.user
+              ?.name ||
+            "",
+        ),
         (e.totalAmount / 100).toString(),
         "INR",
         splitType,
@@ -163,12 +184,25 @@ export function GroupPageContent({
     for (const s of settlements) {
       rows.push([
         formatDate(s.createdAt),
-        escapeCSV(s.note || `${s.paidBy?.name || group.members.find((m: any) => m.userId === s.paidByUserId)?.user?.name || ""} paid ${s.paidTo?.name || group.members.find((m: any) => m.userId === s.paidToUserId)?.user?.name || ""} back`),
-        escapeCSV(s.paidBy?.name || group.members.find((m: any) => m.userId === s.paidByUserId)?.user?.name || ""),
+        escapeCSV(
+          s.note ||
+            `${s.paidBy?.name || group.members.find((m: any) => m.userId === s.paidByUserId)?.user?.name || ""} paid ${s.paidTo?.name || group.members.find((m: any) => m.userId === s.paidToUserId)?.user?.name || ""} back`,
+        ),
+        escapeCSV(
+          s.paidBy?.name ||
+            group.members.find((m: any) => m.userId === s.paidByUserId)?.user
+              ?.name ||
+            "",
+        ),
         (s.amount / 100).toString(),
         "INR",
         "", // empty split_type for settlements
-        escapeCSV(s.paidTo?.name || group.members.find((m: any) => m.userId === s.paidToUserId)?.user?.name || ""),
+        escapeCSV(
+          s.paidTo?.name ||
+            group.members.find((m: any) => m.userId === s.paidToUserId)?.user
+              ?.name ||
+            "",
+        ),
         "", // empty split_details
         escapeCSV(s.note || ""),
         s.createdAt, // keep original date string for sorting

@@ -30,7 +30,10 @@ export function LandingNavbar() {
           <a href="#features" className="hover:text-zinc-900 transition-colors">
             Features
           </a>
-          <a href="#how-it-works" className="hover:text-zinc-900 transition-colors">
+          <a
+            href="#how-it-works"
+            className="hover:text-zinc-900 transition-colors"
+          >
             How It Works
           </a>
         </nav>

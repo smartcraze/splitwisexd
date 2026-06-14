@@ -5,7 +5,10 @@ export async function POST(req: NextRequest) {
   try {
     const { token } = await req.json();
     if (!token) {
-      return NextResponse.json({ success: false, message: "Token is required" }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "Token is required" },
+        { status: 400 },
+      );
     }
 
     const cookieStore = await cookies();

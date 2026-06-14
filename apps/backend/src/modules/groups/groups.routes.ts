@@ -9,7 +9,7 @@ import {
   getUserSummary,
   removeMember,
 } from "./groups.controller.ts";
-import { parseCSVImport, commitCSVImport } from "./import.controller.ts";
+import { commitCSVImport, parseCSVImport } from "./import.controller.ts";
 
 const router = Router();
 
@@ -26,4 +26,3 @@ router.post("/:id/import/parse", parseCSVImport);
 router.post("/:id/import/commit", commitCSVImport);
 
 export default router;
-
