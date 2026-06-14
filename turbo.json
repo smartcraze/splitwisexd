@@ -4,6 +4,7 @@
   "globalDependencies": [".env"],
   "tasks": {
     "build": {
+      "env": ["DATABASE_URL", "JWT_SECRET", "NODE_ENV", "PORT"],
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]

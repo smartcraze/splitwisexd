@@ -8,14 +8,10 @@ import { io } from "../../lib/socket.ts";
 import type { AuthRequest } from "../../middleware/auth.ts";
 import { GroupsRepository } from "../groups/groups.repository.ts";
 import { ExpensesRepository } from "./expenses.repository.ts";
+import { z } from "zod";
 import { createExpenseSchema } from "./expenses.schemas.ts";
 
-interface InputParticipant {
-  userId: string;
-  owedAmount?: number | null;
-  percentage?: number | null;
-  shares?: number | null;
-}
+type InputParticipant = z.infer<typeof createExpenseSchema>["participants"][number];
 
 interface CalculatedParticipant {
   userId: string;
@@ -206,7 +202,7 @@ export const createExpense = asyncHandler(
     const calculatedParticipants = calculateSplits(
       totalAmount,
       splitMethod,
-      participants,
+      participants as InputParticipant[],
     );
 
     const expense = await ExpensesRepository.createExpense(

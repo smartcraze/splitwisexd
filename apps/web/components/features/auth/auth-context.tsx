@@ -51,7 +51,9 @@ function AuthRedirectGuard({
   useEffect(() => {
     if (!loading) {
       const isAuthPage = pathname === "/login" || pathname === "/register";
-      if (!user && !isAuthPage) {
+      const isPublicPage = pathname === "/";
+
+      if (!user && !isAuthPage && !isPublicPage) {
         router.replace("/login");
       } else if (user && isAuthPage) {
         router.replace("/dashboard");
