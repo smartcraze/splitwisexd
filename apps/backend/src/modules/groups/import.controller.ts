@@ -119,7 +119,75 @@ export const parseCSVImport = asyncHandler(async (req: Request, res: Response) =
 
   const usdRate = parseFloat(usdRateParam) || 83;
 
+  // Parse CSV text using csv-parse
+  let rawRecords: any[];
+  try {
+    rawRecords = parse(csvText, {
+      columns: (headers: string[]) => headers.map((h) => h.toLowerCase().trim()),
+      skip_empty_lines: true,
+      trim: true,
+    });
+  } catch (err: any) {
+    throw new AppError(`Failed to parse CSV file: ${err.message}`, 400);
+  }
+
   // Fetch current group members
+  const existingMembers = await prisma.groupMember.findMany({
+    where: { groupId },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+
+  // Extract all unique names from rawRecords
+  const csvNames = new Set<string>();
+  for (const record of rawRecords) {
+    const rawPaidBy = record.paid_by || "";
+    const rawSplitWith = record.split_with || "";
+    if (rawPaidBy.trim()) {
+      csvNames.add(normalizeName(rawPaidBy));
+    }
+    const splits = rawSplitWith.split(";").map((s: string) => normalizeName(s)).filter(Boolean);
+    for (const s of splits) {
+      csvNames.add(s);
+    }
+  }
+
+  // Query all database users to see who exists
+  const allDbUsers = await prisma.user.findMany({
+    select: {
+      id: true,
+      name: true,
+      email: true,
+    },
+  });
+
+  // Automatically join matching users who exist in the database to the group
+  for (const dbUser of allDbUsers) {
+    const normDbName = normalizeName(dbUser.name);
+    const normDbEmailPrefix = normalizeName(dbUser.email.split("@")[0] || "");
+
+    if (csvNames.has(normDbName) || csvNames.has(normDbEmailPrefix)) {
+      const isAlreadyMember = existingMembers.some((m) => m.userId === dbUser.id);
+      if (!isAlreadyMember) {
+        await prisma.groupMember.create({
+          data: {
+            groupId,
+            userId: dbUser.id,
+            role: "MEMBER",
+          },
+        });
+      }
+    }
+  }
+
+  // Fetch updated group members list
   const members = await prisma.groupMember.findMany({
     where: { groupId },
     include: {
@@ -144,18 +212,6 @@ export const parseCSVImport = asyncHandler(async (req: Request, res: Response) =
       createdAt: true,
     },
   });
-
-  // Parse CSV text using csv-parse
-  let rawRecords: any[];
-  try {
-    rawRecords = parse(csvText, {
-      columns: (headers: string[]) => headers.map((h) => h.toLowerCase().trim()),
-      skip_empty_lines: true,
-      trim: true,
-    });
-  } catch (err: any) {
-    throw new AppError(`Failed to parse CSV file: ${err.message}`, 400);
-  }
 
   const resolvedRows = rawRecords.map((raw: any, idx: number) => {
     const anomalies: any[] = [];
@@ -575,7 +631,7 @@ export const commitCSVImport = asyncHandler(async (req: Request, res: Response) 
     }
   }
 
-  // Insert everything inside a single database transaction
+  // Insert everything inside a single database transaction with a 30s timeout
   const result = await prisma.$transaction(async (tx) => {
     const createdExpenses = [];
     const createdSettlements = [];
@@ -630,6 +686,8 @@ export const commitCSVImport = asyncHandler(async (req: Request, res: Response) 
       expensesCount: createdExpenses.length,
       settlementsCount: createdSettlements.length,
     };
+  }, {
+    timeout: 30000 // 30 seconds timeout
   });
 
   // Invalidate Redis/in-memory cache tags
