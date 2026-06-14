@@ -21,6 +21,7 @@
     "packages/*"
   ],
   "dependencies": {
-    "@biomejs/biome": "^2.4.16"
+    "@biomejs/biome": "^2.4.16",
+    "csv": "^6.5.1"
   }
 }

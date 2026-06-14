@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, CreditCard, PlusCircle, UserPlus } from "lucide-react";
+import { ArrowLeft, CreditCard, PlusCircle, UserPlus, Upload, Download } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -10,6 +10,8 @@ interface GroupHeaderProps {
   onAddExpense: () => void;
   onSettleUp: () => void;
   onAddMember: () => void;
+  onImportCSV: () => void;
+  onExportCSV: () => void;
 }
 
 export function GroupHeader({
@@ -18,6 +20,8 @@ export function GroupHeader({
   onAddExpense,
   onSettleUp,
   onAddMember,
+  onImportCSV,
+  onExportCSV,
 }: GroupHeaderProps) {
   return (
     <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0 pb-6 border-b border-border">
@@ -37,6 +41,20 @@ export function GroupHeader({
       </div>
 
       <div className="flex flex-wrap gap-2 sm:self-end ml-7 md:ml-0">
+        <Button
+          onClick={onImportCSV}
+          variant="outline"
+          className="border-border text-foreground hover:bg-muted font-semibold"
+        >
+          <Upload className="mr-2 h-4 w-4" /> Import CSV
+        </Button>
+        <Button
+          onClick={onExportCSV}
+          variant="outline"
+          className="border-border text-foreground hover:bg-muted font-semibold"
+        >
+          <Download className="mr-2 h-4 w-4" /> Export CSV
+        </Button>
         <Button
           onClick={onAddMember}
           variant="outline"

@@ -117,8 +117,14 @@ export const api = {
   createComment: (body: any) =>
     request<any>("/comments", { method: "POST", body: JSON.stringify(body) }),
 
-  importGroupData: (groupId: string, body: any) =>
-    request<any>(`/groups/${groupId}/import`, {
+  parseCSV: (groupId: string, csvText: string, usdRate: number) =>
+    request<any[]>(`/groups/${groupId}/import/parse`, {
+      method: "POST",
+      body: JSON.stringify({ csvText, usdRate }),
+    }),
+
+  commitImport: (groupId: string, body: any) =>
+    request<any>(`/groups/${groupId}/import/commit`, {
       method: "POST",
       body: JSON.stringify(body),
     }),

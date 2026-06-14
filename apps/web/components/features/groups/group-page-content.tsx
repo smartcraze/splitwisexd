@@ -13,6 +13,7 @@ import { SettlementsList } from "@/components/features/settlements/settlements-l
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
 import { useSocket } from "@/lib/socket";
+import { CSVImportDialog } from "@/components/features/groups/csv-import-dialog";
 
 interface GroupPageContentProps {
   groupId: string;
@@ -40,6 +41,7 @@ export function GroupPageContent({
   const [editExpense, setEditExpense] = useState<any>(null);
   const [settleOpen, setSettleOpen] = useState(false);
   const [memberOpen, setMemberOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [prefillSettle, setPrefillSettle] = useState<any>(null);
 
   useEffect(() => {
@@ -74,6 +76,126 @@ export function GroupPageContent({
     router.refresh();
   };
 
+  const handleExportCSV = () => {
+    const headers = [
+      "date",
+      "description",
+      "paid_by",
+      "amount",
+      "currency",
+      "split_type",
+      "split_with",
+      "split_details",
+      "notes",
+    ];
+
+    const escapeCSV = (str: string | null | undefined) => {
+      if (!str) return "";
+      const cleaned = str.replace(/\r?\n|\r/g, " ");
+      if (cleaned.includes(",") || cleaned.includes('"')) {
+        return `"${cleaned.replace(/"/g, '""')}"`;
+      }
+      return cleaned;
+    };
+
+    const formatDate = (dateStr: string) => {
+      const d = new Date(dateStr);
+      const pad = (n: number) => String(n).padStart(2, "0");
+      return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
+    };
+
+    const rows: string[][] = [];
+
+    // Format expenses
+    for (const e of expenses) {
+      const splitWithNames = e.participants
+        .map((p: any) => p.user?.name || group.members.find((m: any) => m.userId === p.userId)?.user?.name)
+        .filter(Boolean)
+        .join(";");
+
+      let splitDetails = "";
+      if (e.splitMethod === "UNEQUAL") {
+        splitDetails = e.participants
+          .map((p: any) => {
+            const name = p.user?.name || group.members.find((m: any) => m.userId === p.userId)?.user?.name || "";
+            return `${name} ${p.owedAmount / 100}`;
+          })
+          .filter(Boolean)
+          .join("; ");
+      } else if (e.splitMethod === "PERCENTAGE") {
+        splitDetails = e.participants
+          .map((p: any) => {
+            const name = p.user?.name || group.members.find((m: any) => m.userId === p.userId)?.user?.name || "";
+            return `${name} ${p.percentage}%`;
+          })
+          .filter(Boolean)
+          .join("; ");
+      } else if (e.splitMethod === "SHARES") {
+        splitDetails = e.participants
+          .map((p: any) => {
+            const name = p.user?.name || group.members.find((m: any) => m.userId === p.userId)?.user?.name || "";
+            return `${name} ${p.shares}`;
+          })
+          .filter(Boolean)
+          .join("; ");
+      }
+
+      let splitType = "equal";
+      if (e.splitMethod === "UNEQUAL") splitType = "unequal";
+      if (e.splitMethod === "PERCENTAGE") splitType = "percentage";
+      if (e.splitMethod === "SHARES") splitType = "share";
+
+      rows.push([
+        formatDate(e.createdAt),
+        escapeCSV(e.title),
+        escapeCSV(e.paidBy?.name || group.members.find((m: any) => m.userId === e.paidByUserId)?.user?.name || ""),
+        (e.totalAmount / 100).toString(),
+        "INR",
+        splitType,
+        escapeCSV(splitWithNames),
+        escapeCSV(splitDetails),
+        escapeCSV(e.description || ""),
+        e.createdAt, // keep original date string for sorting
+      ]);
+    }
+
+    // Format settlements
+    for (const s of settlements) {
+      rows.push([
+        formatDate(s.createdAt),
+        escapeCSV(s.note || `${s.paidBy?.name || group.members.find((m: any) => m.userId === s.paidByUserId)?.user?.name || ""} paid ${s.paidTo?.name || group.members.find((m: any) => m.userId === s.paidToUserId)?.user?.name || ""} back`),
+        escapeCSV(s.paidBy?.name || group.members.find((m: any) => m.userId === s.paidByUserId)?.user?.name || ""),
+        (s.amount / 100).toString(),
+        "INR",
+        "", // empty split_type for settlements
+        escapeCSV(s.paidTo?.name || group.members.find((m: any) => m.userId === s.paidToUserId)?.user?.name || ""),
+        "", // empty split_details
+        escapeCSV(s.note || ""),
+        s.createdAt, // keep original date string for sorting
+      ]);
+    }
+
+    // Sort rows by date ascending (chronological order)
+    rows.sort((a, b) => new Date(a[9]!).getTime() - new Date(b[9]!).getTime());
+
+    // Generate CSV string
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((r) => r.slice(0, 9).join(",")),
+    ].join("\n");
+
+    // Trigger download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `${group.name}_expenses_export.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <GroupHeader
@@ -88,6 +210,8 @@ export function GroupPageContent({
           setSettleOpen(true);
         }}
         onAddMember={() => setMemberOpen(true)}
+        onImportCSV={() => setImportOpen(true)}
+        onExportCSV={handleExportCSV}
       />
 
       <div className="grid gap-6 md:grid-cols-3 items-start">
@@ -157,6 +281,14 @@ export function GroupPageContent({
         open={memberOpen}
         onOpenChange={setMemberOpen}
         onMemberAdded={handleRefresh}
+      />
+      <CSVImportDialog
+        groupId={groupId}
+        members={group.members}
+        existingExpenses={expenses}
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        onImportComplete={handleRefresh}
       />
     </div>
   );
