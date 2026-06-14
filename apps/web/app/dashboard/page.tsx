@@ -91,7 +91,14 @@ async function DashboardPageContentDynamic() {
   for (const g of groups.slice(0, 5)) {
     try {
       const bal = await getGroupBalances(g.id);
-      debtsList.push(...(bal.debts ?? []));
+      if (bal.debts) {
+        for (const d of bal.debts) {
+          debtsList.push({
+            ...d,
+            groupId: g.id,
+          });
+        }
+      }
     } catch (_) {}
   }
 
@@ -118,6 +125,7 @@ async function DashboardPageContentDynamic() {
 
   const serializedDebts = debtsList.map((d) => ({
     ...d,
+    groupId: d.groupId,
     amount: d.amount,
     fromUser: { ...d.fromUser },
     toUser: { ...d.toUser },

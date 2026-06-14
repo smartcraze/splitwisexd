@@ -1,12 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 import { GroupsList } from "@/components/features/dashboard/groups-list";
 import { RecentActivity } from "@/components/features/dashboard/recent-activity";
 import { SettleUpPanel } from "@/components/features/dashboard/settle-up-panel";
 import { SpendingChart } from "@/components/features/dashboard/spending-chart";
 import { SummaryCards } from "@/components/features/dashboard/summary-cards";
+import { SettleUpDialog } from "@/components/features/settlements/settle-up-dialog";
 
 interface DashboardContentProps {
   groups: any[];
@@ -34,9 +35,25 @@ export function DashboardContent({
   const router = useRouter();
   const totalSpend = summary.youOwe + summary.youAreOwed;
 
+  const [settleOpen, setSettleOpen] = useState(false);
+  const [settlePrefill, setSettlePrefill] = useState<{ paidToUserId: string; amount: number } | null>(null);
+  const [settleGroupId, setSettleGroupId] = useState<string>("");
+
   const handleGroupCreated = () => {
     router.refresh();
   };
+
+  const handleSettleClick = (debt: any) => {
+    setSettleGroupId(debt.groupId);
+    setSettlePrefill({
+      paidToUserId: debt.toUser.id,
+      amount: debt.amount,
+    });
+    setSettleOpen(true);
+  };
+
+  const activeGroup = groups.find((g) => g.id === settleGroupId);
+  const activeMembers = activeGroup ? activeGroup.members : [];
 
   return (
     <div className="max-w-[1200px] mx-auto">
@@ -83,11 +100,26 @@ export function DashboardContent({
         {/* Right panel */}
         <div className="hidden xl:flex flex-col gap-5 w-[300px] shrink-0">
           {allDebts.length > 0 && (
-            <SettleUpPanel debts={allDebts} currentUserId={user.id} />
+            <SettleUpPanel
+              debts={allDebts}
+              currentUserId={user.id}
+              onSettle={handleSettleClick}
+              onRemind={(debt) => alert(`Reminder sent to ${debt.fromUser.name}!`)}
+            />
           )}
           <SpendingChart totalAmount={totalSpend} />
         </div>
       </div>
+
+      <SettleUpDialog
+        groupId={settleGroupId}
+        members={activeMembers}
+        currentUserId={user.id}
+        open={settleOpen}
+        onOpenChange={setSettleOpen}
+        onSettlementSaved={() => router.refresh()}
+        prefill={settlePrefill}
+      />
     </div>
   );
 }

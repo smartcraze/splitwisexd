@@ -14,6 +14,7 @@ interface SettleUpPanelProps {
   debts: Debt[];
   currentUserId: string;
   onRemind?: (debt: Debt) => void;
+  onSettle?: (debt: Debt) => void;
 }
 
 function getInitials(name: string | undefined) {
@@ -30,6 +31,7 @@ export function SettleUpPanel({
   debts,
   currentUserId,
   onRemind,
+  onSettle,
 }: SettleUpPanelProps) {
   if (debts.length === 0) return null;
 
@@ -76,7 +78,13 @@ export function SettleUpPanel({
                   size="sm"
                   variant="outline"
                   className="h-7 px-3 text-xs font-semibold border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground"
-                  onClick={() => onRemind?.(debt)}
+                  onClick={() => {
+                    if (isCurrentOwer) {
+                      onSettle?.(debt);
+                    } else {
+                      onRemind?.(debt);
+                    }
+                  }}
                 >
                   {isCurrentOwer ? "Settle" : "Remind"}
                 </Button>
