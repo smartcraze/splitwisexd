@@ -313,7 +313,7 @@ export function GroupsList({ groups, onGroupCreated }: GroupsListProps) {
                 <div className="flex items-center justify-between mt-3 pt-3 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
-                    {new Date(group.createdAt).toLocaleDateString(undefined, {
+                    {new Date(group.createdAt).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
                       year: "numeric",

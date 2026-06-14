@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, use, Suspense } from "react";
 import { GroupsList } from "@/components/features/dashboard/groups-list";
 import { RecentActivity } from "@/components/features/dashboard/recent-activity";
 import { SettleUpPanel } from "@/components/features/dashboard/settle-up-panel";
@@ -16,8 +16,8 @@ interface DashboardContentProps {
     youAreOwed: number;
     youOwe: number;
   };
-  allDebts: any[];
-  recentActivities: any[];
+  recentActivitiesPromise: Promise<any[]>;
+  allDebtsPromise: Promise<any[]>;
   user: {
     id: string;
     name: string;
@@ -25,11 +25,49 @@ interface DashboardContentProps {
   };
 }
 
+function RecentActivityStream({ promise }: { promise: Promise<any[]> }) {
+  const activities = use(promise);
+  if (activities.length === 0) return null;
+  return (
+    <div>
+      <h2 className="text-xl font-bold tracking-tight mb-4">
+        Recent Activity
+      </h2>
+      <div className="bg-card rounded-2xl border border-border shadow-sm">
+        <RecentActivity activities={activities} />
+      </div>
+    </div>
+  );
+}
+
+function SettleUpStream({ 
+  promise, 
+  currentUserId, 
+  onSettle, 
+  onRemind 
+}: { 
+  promise: Promise<any[]>, 
+  currentUserId: string,
+  onSettle: (debt: any) => void,
+  onRemind: (debt: any) => void
+}) {
+  const debts = use(promise);
+  if (debts.length === 0) return null;
+  return (
+    <SettleUpPanel
+      debts={debts}
+      currentUserId={currentUserId}
+      onSettle={onSettle}
+      onRemind={onRemind}
+    />
+  );
+}
+
 export function DashboardContent({
   groups,
   summary,
-  allDebts,
-  recentActivities,
+  recentActivitiesPromise,
+  allDebtsPromise,
   user,
 }: DashboardContentProps) {
   const router = useRouter();
@@ -88,30 +126,32 @@ export function DashboardContent({
             <GroupsList groups={groups} onGroupCreated={handleGroupCreated} />
           </div>
 
-          {recentActivities.length > 0 && (
-            <div>
-              <h2 className="text-xl font-bold tracking-tight mb-4">
-                Recent Activity
-              </h2>
-              <div className="bg-card rounded-2xl border border-border shadow-sm">
-                <RecentActivity activities={recentActivities} />
+          <Suspense
+            fallback={
+              <div>
+                <h2 className="text-xl font-bold tracking-tight mb-4">
+                  Recent Activity
+                </h2>
+                <div className="bg-card rounded-2xl border border-border shadow-sm p-4 h-32 animate-pulse" />
               </div>
-            </div>
-          )}
+            }
+          >
+            <RecentActivityStream promise={recentActivitiesPromise} />
+          </Suspense>
         </div>
 
         {/* Right panel */}
         <div className="hidden xl:flex flex-col gap-5 w-[300px] shrink-0">
-          {allDebts.length > 0 && (
-            <SettleUpPanel
-              debts={allDebts}
+          <Suspense fallback={<div className="bg-card rounded-2xl border border-border shadow-sm p-5 h-48 animate-pulse" />}>
+            <SettleUpStream
+              promise={allDebtsPromise}
               currentUserId={user.id}
               onSettle={handleSettleClick}
               onRemind={(debt) =>
                 alert(`Reminder sent to ${debt.fromUser.name}!`)
               }
             />
-          )}
+          </Suspense>
           <SpendingChart totalAmount={totalSpend} />
         </div>
       </div>

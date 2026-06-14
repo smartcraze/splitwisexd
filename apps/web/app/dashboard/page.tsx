@@ -33,74 +33,82 @@ async function DashboardPageContentDynamic() {
     getCachedUserSummary(user.id),
   ]);
 
-  // 2. Build recent activities from database directly
-  const activities: any[] = [];
-  for (const g of groups.slice(0, 3)) {
-    try {
-      const [expenses, settlements] = await Promise.all([
-        prisma.expense.findMany({
-          where: { groupId: g.id },
-          include: { paidBy: { select: { name: true } } },
-          orderBy: { createdAt: "desc" },
-          take: 2,
-        }),
-        prisma.settlement.findMany({
-          where: { groupId: g.id, status: "COMPLETED" },
-          include: {
-            paidBy: { select: { name: true } },
-            paidTo: { select: { name: true } },
-          },
-          orderBy: { createdAt: "desc" },
-          take: 1,
-        }),
-      ]);
+  // 2. Build recent activities from database as a Promise
+  const recentActivitiesPromise = (async () => {
+    const activities: any[] = [];
+    const promises = groups.slice(0, 3).map(async (g) => {
+      try {
+        const [expenses, settlements] = await Promise.all([
+          prisma.expense.findMany({
+            where: { groupId: g.id },
+            include: { paidBy: { select: { name: true } } },
+            orderBy: { createdAt: "desc" },
+            take: 2,
+          }),
+          prisma.settlement.findMany({
+            where: { groupId: g.id, status: "COMPLETED" },
+            include: {
+              paidBy: { select: { name: true } },
+              paidTo: { select: { name: true } },
+            },
+            orderBy: { createdAt: "desc" },
+            take: 1,
+          }),
+        ]);
+        return { group: g, expenses, settlements };
+      } catch (_) {
+        return { group: g, expenses: [], settlements: [] };
+      }
+    });
 
+    const results = await Promise.all(promises);
+    for (const { group, expenses, settlements } of results) {
       for (const e of expenses) {
         activities.push({
           id: e.id,
           type: "expense",
-          title: `You added an expense in ${g.name}`,
+          title: `You added an expense in ${group.name}`,
           subtitle: `${e.title} • ₹${(e.totalAmount / 100).toFixed(2)}`,
           amount: e.totalAmount,
-          groupName: g.name,
+          groupName: group.name,
           createdAt: e.createdAt.toISOString(),
         });
       }
-
       for (const s of settlements) {
         activities.push({
           id: s.id,
           type: "settlement",
-          title: `${s.paidBy.name} paid ${s.paidTo.name} in ${g.name}`,
+          title: `${s.paidBy.name} paid ${s.paidTo.name} in ${group.name}`,
           subtitle: `₹${(s.amount / 100).toFixed(2)}`,
-          groupName: g.name,
+          groupName: group.name,
           createdAt: s.createdAt.toISOString(),
         });
       }
-    } catch (_) {}
-  }
+    }
+    activities.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return activities.slice(0, 5);
+  })();
 
-  // Sort activities by date
-  activities.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  );
-  const recentActivities = activities.slice(0, 5);
-
-  // 3. Collect debts from all groups for Settle Up panel
-  const debtsList: any[] = [];
-  for (const g of groups.slice(0, 5)) {
-    try {
-      const bal = await getGroupBalances(g.id);
-      if (bal.debts) {
-        for (const d of bal.debts) {
-          debtsList.push({
+  // 3. Collect debts from all groups for Settle Up panel as a Promise
+  const allDebtsPromise = (async () => {
+    const promises = groups.slice(0, 5).map(async (g) => {
+      try {
+        const bal = await getGroupBalances(g.id);
+        if (bal.debts) {
+          return bal.debts.map((d: any) => ({
             ...d,
             groupId: g.id,
-          });
+            amount: d.amount,
+            fromUser: { ...d.fromUser },
+            toUser: { ...d.toUser },
+          }));
         }
-      }
-    } catch (_) {}
-  }
+      } catch (_) {}
+      return [];
+    });
+    const results = await Promise.all(promises);
+    return results.flat();
+  })();
 
   // Serialize models for safety (convert dates to ISO strings)
   const serializedGroups = groups.map((g) => ({
@@ -110,33 +118,21 @@ async function DashboardPageContentDynamic() {
     members: g.members.map((m) => ({
       ...m,
       joinedAt: m.joinedAt.toISOString(),
-      user: {
-        ...m.user,
-      },
+      user: { ...m.user },
     })),
   }));
 
   const serializedSummary = {
     ...summary,
-    groups: summary.groups.map((sg: any) => ({
-      ...sg,
-    })),
+    groups: summary.groups.map((sg: any) => ({ ...sg })),
   };
-
-  const serializedDebts = debtsList.map((d) => ({
-    ...d,
-    groupId: d.groupId,
-    amount: d.amount,
-    fromUser: { ...d.fromUser },
-    toUser: { ...d.toUser },
-  }));
 
   return (
     <DashboardContent
       groups={serializedGroups}
       summary={serializedSummary}
-      allDebts={serializedDebts}
-      recentActivities={recentActivities}
+      recentActivitiesPromise={recentActivitiesPromise}
+      allDebtsPromise={allDebtsPromise}
       user={user}
     />
   );
