@@ -6,6 +6,14 @@
   "exports": {
     ".": "./index.ts"
   },
+  "scripts": {
+    "migrate": "prisma migrate dev --skip-seed",
+    "generate": "prisma generate",
+    "studio": "prisma studio",
+    "push": "prisma db push --skip-seed",
+    "seed": "prisma db seed",
+    "postinstall": "prisma generate"
+  },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",
     "@types/bun": "latest",
