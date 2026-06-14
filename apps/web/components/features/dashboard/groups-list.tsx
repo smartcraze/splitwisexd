@@ -22,45 +22,81 @@ interface GroupsListProps {
 
 // Map group name keywords to images from /public
 const GROUP_IMAGE_MAP: { keywords: string[]; src: string }[] = [
+  // Beach
   {
-    keywords: [
-      "food",
-      "eat",
-      "lunch",
-      "dinner",
-      "restaurant",
-      "cafe",
-      "pizza",
-      "snack",
-    ],
+    keywords: ["beach", "sea", "ocean", "coast", "goa", "maldives", "island", "shore"],
+    src: "/beach-1.png",
+  },
+  // Food (1)
+  {
+    keywords: ["food", "eat", "lunch", "dinner", "breakfast", "restaurant", "cafe", "pizza", "snack", "meal", "cook", "kitchen"],
     src: "/food-1.png",
   },
+  // Food (2) — flatmates, home cooking
   {
-    keywords: [
-      "trip",
-      "travel",
-      "tour",
-      "vacation",
-      "goa",
-      "ladakh",
-      "trek",
-      "hike",
-      "mountain",
-      "beach",
-    ],
+    keywords: ["flat", "house", "home", "room", "roommate", "flatmate", "rent", "pg", "hostel", "dorm", "apartment"],
+    src: "/food-2.png",
+  },
+  // Party (1)
+  {
+    keywords: ["party", "birthday", "celebrate", "celebration", "fest", "festival", "new year", "wedding", "event", "bash", "club"],
+    src: "/party-1.png",
+  },
+  // Party (2)
+  {
+    keywords: ["night out", "nightout", "drinks", "bar", "pub", "outing", "hangout", "friends night", "reunion"],
+    src: "/party-2.png",
+  },
+  // Road trip (1)
+  {
+    keywords: ["roadtrip", "road trip", "road", "drive", "car trip", "highway", "bike trip", "biketrip", "motorcycle"],
+    src: "/roadtrip-1.png",
+  },
+  // Road trip (2)
+  {
+    keywords: ["ladakh", "manali", "spiti", "leh", "himalaya", "mountain", "trek", "hike", "camp", "camping", "adventure"],
+    src: "/roadtrip-2.png",
+  },
+  // Travel (1)
+  {
+    keywords: ["trip", "travel", "tour", "vacation", "holiday", "flight", "abroad", "international", "backpack"],
     src: "/travel-1.png",
   },
+  // Travel (2)
   {
-    keywords: ["flat", "house", "room", "home", "rent", "flatmate"],
-    src: "/food-2.png",
+    keywords: ["explore", "journey", "destination", "sightseeing", "europe", "asia", "thailand", "bali", "singapore"],
+    src: "/travel-2.png",
+  },
+  // Work (1)
+  {
+    keywords: ["work", "office", "team", "project", "client", "meeting", "business", "corporate", "company"],
+    src: "/work-1.png",
+  },
+  // Work (2)
+  {
+    keywords: ["startup", "coworking", "cowork", "remote", "freelance", "studio", "agency", "conference"],
+    src: "/work-2.png",
+  },
+  // Work (3) — tech / gaming
+  {
+    keywords: ["tech", "gaming", "game", "lan", "hackathon", "coding", "dev", "college", "uni", "university", "class", "course"],
+    src: "/work-3.png",
   },
 ];
 
 const FALLBACK_IMAGES = [
   "/travel-1.png",
+  "/party-1.png",
   "/food-1.png",
+  "/roadtrip-1.png",
+  "/beach-1.png",
+  "/work-1.png",
   "/travel-2.png",
+  "/party-2.png",
   "/food-2.png",
+  "/roadtrip-2.png",
+  "/work-2.png",
+  "/work-3.png",
 ];
 
 function getGroupImage(name: string, index: number): string {
@@ -70,7 +106,7 @@ function getGroupImage(name: string, index: number): string {
       return mapping.src;
     }
   }
-  return FALLBACK_IMAGES[index % FALLBACK_IMAGES.length];
+  return FALLBACK_IMAGES[index % FALLBACK_IMAGES.length]!;
 }
 
 export function GroupsList({ groups, onGroupCreated }: GroupsListProps) {
