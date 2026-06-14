@@ -4,63 +4,57 @@ export function LandingHowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="border-t border-b border-white/5 bg-[#070708] relative z-10 py-24"
+      className="border-t border-zinc-100 bg-zinc-50 relative z-10 py-28"
     >
       <div className="max-w-7xl mx-auto px-6 space-y-16">
-        <div className="text-center space-y-3">
-          <span className="text-[10px] bg-primary/10 text-primary border border-primary/20 font-black tracking-widest uppercase px-3 py-1 rounded-full">
+
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <span className="text-[11px] bg-primary/6 text-primary border border-primary/20 font-black tracking-widest uppercase px-4 py-1.5 rounded-full">
             Workflow
           </span>
-          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white">
-            Three steps to complete clarity.
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter text-zinc-900 leading-tight mt-4">
+            Three steps to<br className="hidden sm:block" /> complete clarity.
           </h2>
-          <p className="text-sm text-zinc-400 max-w-md mx-auto leading-relaxed">
-            No complex setup processes. Get started splitting and settling in
-            under a minute.
+          <p className="text-base md:text-lg text-zinc-500 max-w-md mx-auto leading-relaxed mt-2">
+            No complex setup. Start splitting in under a minute.
           </p>
         </div>
 
-        {/* Steps columns */}
-        <div className="grid gap-8 md:grid-cols-3 max-w-4xl mx-auto relative">
+        {/* Step cards — no numbered labels, use the icon + word as anchor */}
+        <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto">
           {[
             {
-              step: "01",
               title: "Create a Group",
-              desc: "Set up a shared space for a trip, flatmates, team event, or outing, and add members.",
+              desc: "Set up a shared space for any scenario — a trip, a flat, a team dinner. Invite members by email.",
               icon: Users,
+              accent: "from-rose-50 to-white",
             },
             {
-              step: "02",
-              title: "Add Shared Expenses",
-              desc: "Input payments, configure how they are split, and let SplitwiseXD handle the math.",
+              title: "Add Expenses",
+              desc: "Log who paid, input the amount, choose your split method. The math resolves immediately.",
               icon: Coins,
+              accent: "from-rose-50 to-white",
             },
             {
-              step: "03",
-              title: "Settle Up Balances",
-              desc: "See exactly who owes whom and record payments to settle outstanding debt.",
+              title: "Settle Debts",
+              desc: "See the minimal transactions needed to clear all balances, then record payments as they happen.",
               icon: Wallet,
+              accent: "from-rose-50 to-white",
             },
           ].map((s) => {
             const Icon = s.icon;
             return (
               <div
-                key={s.step}
-                className="bg-black/30 border border-white/5 p-6 rounded-2xl space-y-4 relative group hover:border-primary/10 transition-colors"
+                key={s.title}
+                className="bg-white border border-zinc-200 p-8 rounded-2xl space-y-5 group hover:border-primary/25 hover:shadow-md transition-all duration-300"
               >
-                <div className="flex justify-between items-center">
-                  <span className="text-2xl font-black text-white/10 group-hover:text-primary/20 transition-colors">
-                    {s.step}
-                  </span>
-                  <div className="h-8 w-8 rounded-lg bg-primary/5 text-primary flex items-center justify-center border border-primary/15">
-                    <Icon className="h-4 w-4" />
-                  </div>
+                <div className={`h-14 w-14 rounded-2xl bg-gradient-to-br ${s.accent} border border-primary/15 flex items-center justify-center text-primary`}>
+                  <Icon className="h-6 w-6" />
                 </div>
-                <div className="space-y-1">
-                  <h3 className="font-bold text-sm text-white">{s.title}</h3>
-                  <p className="text-xs text-zinc-400 leading-relaxed">
-                    {s.desc}
-                  </p>
+                <div className="space-y-2">
+                  <h3 className="font-black text-xl text-zinc-900">{s.title}</h3>
+                  <p className="text-sm text-zinc-500 leading-relaxed">{s.desc}</p>
                 </div>
               </div>
             );

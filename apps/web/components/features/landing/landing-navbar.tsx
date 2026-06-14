@@ -11,29 +11,26 @@ export function LandingNavbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-[#050505]/80 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full border-b border-zinc-100 bg-white/90 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link
           href="/"
-          className="flex items-center gap-2.5 font-black text-lg tracking-tight shrink-0"
+          className="flex items-center gap-2.5 font-black text-lg tracking-tight shrink-0 text-zinc-900"
         >
-          <div className="p-1.5 bg-primary text-primary-foreground rounded-lg shadow-[0_0_15px_rgba(225,29,72,0.4)]">
-            <Landmark className="h-4.5 w-4.5" />
+          <div className="p-1.5 bg-primary text-white rounded-lg shadow-[0_0_12px_rgba(220,38,38,0.3)]">
+            <Landmark className="h-4 w-4" />
           </div>
           <span>
             Splitwise<span className="text-primary">XD</span>
           </span>
         </Link>
 
-        {/* Desktop Nav Links */}
-        <nav className="hidden md:flex items-center gap-8 text-xs font-semibold text-zinc-400">
-          <a href="#features" className="hover:text-white transition-colors">
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-8 text-xs font-semibold text-zinc-500">
+          <a href="#features" className="hover:text-zinc-900 transition-colors">
             Features
           </a>
-          <a
-            href="#how-it-works"
-            className="hover:text-white transition-colors"
-          >
+          <a href="#how-it-works" className="hover:text-zinc-900 transition-colors">
             How It Works
           </a>
         </nav>
@@ -42,7 +39,7 @@ export function LandingNavbar() {
         <div className="hidden md:flex items-center gap-4">
           {user ? (
             <Link href="/dashboard">
-              <Button className="bg-primary hover:bg-primary/95 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-[0_0_15px_rgba(225,29,72,0.3)] transition-all hover:scale-[1.02]">
+              <Button className="bg-primary hover:bg-primary/90 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-[0_0_12px_rgba(220,38,38,0.25)] transition-all hover:scale-[1.02]">
                 Go to Dashboard
               </Button>
             </Link>
@@ -50,12 +47,12 @@ export function LandingNavbar() {
             <>
               <Link
                 href="/login"
-                className="text-xs font-bold text-zinc-400 hover:text-white transition-colors px-3 py-2"
+                className="text-xs font-bold text-zinc-500 hover:text-zinc-900 transition-colors px-3 py-2"
               >
                 Log in
               </Link>
               <Link href="/register">
-                <Button className="bg-primary hover:bg-primary/95 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-[0_0_15px_rgba(225,29,72,0.3)] transition-all hover:scale-[1.02]">
+                <Button className="bg-primary hover:bg-primary/90 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-[0_0_12px_rgba(220,38,38,0.25)] transition-all hover:scale-[1.02]">
                   Get Started Free
                 </Button>
               </Link>
@@ -66,7 +63,7 @@ export function LandingNavbar() {
         {/* Mobile hamburger */}
         <button
           type="button"
-          className="md:hidden p-2 rounded-lg hover:bg-white/5 text-zinc-400 hover:text-white"
+          className="md:hidden p-2 rounded-lg hover:bg-zinc-100 text-zinc-500 hover:text-zinc-900"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? (
@@ -77,27 +74,27 @@ export function LandingNavbar() {
         </button>
       </div>
 
-      {/* Mobile menu drawer */}
+      {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-white/5 bg-[#050505]/95 backdrop-blur-lg px-6 py-6 space-y-4 flex flex-col text-sm font-semibold">
+        <div className="md:hidden border-b border-zinc-100 bg-white px-6 py-6 space-y-4 flex flex-col text-sm font-semibold">
           <a
             href="#features"
             onClick={() => setMobileMenuOpen(false)}
-            className="text-zinc-400 hover:text-white py-1"
+            className="text-zinc-500 hover:text-zinc-900 py-1"
           >
             Features
           </a>
           <a
             href="#how-it-works"
             onClick={() => setMobileMenuOpen(false)}
-            className="text-zinc-400 hover:text-white py-1"
+            className="text-zinc-500 hover:text-zinc-900 py-1"
           >
             How It Works
           </a>
-          <div className="h-px bg-white/5 my-2" />
+          <div className="h-px bg-zinc-100 my-2" />
           {user ? (
             <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-              <Button className="w-full bg-primary hover:bg-primary/95 text-white font-bold text-sm py-2.5 rounded-xl shadow-lg">
+              <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold text-sm py-2.5 rounded-xl">
                 Go to Dashboard
               </Button>
             </Link>
@@ -106,12 +103,12 @@ export function LandingNavbar() {
               <Link
                 href="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-center text-zinc-400 hover:text-white py-2"
+                className="text-center text-zinc-500 hover:text-zinc-900 py-2"
               >
                 Log in
               </Link>
               <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                <Button className="w-full bg-primary hover:bg-primary/95 text-white font-bold text-sm py-2.5 rounded-xl shadow-lg">
+                <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold text-sm py-2.5 rounded-xl">
                   Get Started Free
                 </Button>
               </Link>
