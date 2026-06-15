@@ -4,7 +4,7 @@
 - **Problem**: Ingesting messy CSV data with 12 anomalies while respecting Meera's request: *"Clean up the duplicates — but I want to approve anything the app deletes or changes."*
 - **Options Considered**:
   1. *Backend Import Endpoint*: File is uploaded, parsed on backend, and automatically written to DB with automated guesses (e.g. auto-excluding Sam, auto-deleting duplicates).
-  2. *Client-side Wizard with Review Screen (Selected)*: Parse file in-browser, execute the anomaly engine, and render cards showing the exact warning details. Provide interactive checkboxes and inputs for Meera's approval.
+  2. *Client-side Wizard with Preview API (Selected)*: Send the file to a backend preview endpoint to execute the anomaly engine, then render cards on the client showing the exact warning details. Provide interactive checkboxes and inputs for Meera's approval before final submission.
 - **Decision Rationale**: Option 2 satisfies Meera's request perfectly. It lets users see exactly what the importer intends to skip (e.g. duplicate rows) or modify (USD rate, user exclusions) before anything touches the persistent relational database.
 
 ---

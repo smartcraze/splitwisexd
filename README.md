@@ -41,7 +41,7 @@ bun run build
 
 ```
 ├── apps/
-│   ├── web/         # Next.js 16 Frontend (React 19, Tailwind v4, Lucide/Tabler Icons)
+│   ├── web/         # Next.js 16 Frontend (React 19, Tailwind v4, Lucide Icons)
 │   └── backend/     # Express API Server (Node HTTP, Socket.io, JWT Authentication)
 ├── packages/
 │   ├── db/          # Database package containing Prisma schema and Client

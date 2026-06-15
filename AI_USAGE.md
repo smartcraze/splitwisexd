@@ -13,17 +13,15 @@
 
 Here are three instances where the AI generated incomplete or incorrect code, how it was detected, and how we resolved it:
 
-### Case 1: Missing Shadcn Components (`Checkbox` & `Badge`)
-- **What happened**: The AI generated code in `import-row-card.tsx` and `expense-dialog.tsx` that imported `Checkbox` and `Badge` from `@/components/ui/checkbox` and `@/components/ui/badge`.
+### Case 1: Missing Shadcn Component (`Checkbox`)
+- **What happened**: The AI generated code that imported `Checkbox` from `@/components/ui/checkbox`.
 - **How it was caught**: Running `bun run build` failed with:
   ```bash
   Module not found: Can't resolve '@/components/ui/checkbox'
-  Module not found: Can't resolve '@/components/ui/badge'
   ```
-  Checking the `apps/web/components/ui` folder revealed those specific shadcn components were not installed in the workspace.
-- **What was changed**: Instead of installing extra NPM packages or configuring new component files, we replaced the custom components with native HTML elements and Tailwind classes:
+  Checking the `apps/web/components/ui` folder revealed the Checkbox component was not installed in the workspace.
+- **What was changed**: Instead of installing extra NPM packages or configuring new component files, we replaced the custom component with a native HTML element and Tailwind classes:
   - Replaced `<Checkbox>` with `<input type="checkbox" className="h-4 w-4 rounded accent-primary cursor-pointer" />`.
-  - Replaced `<Badge>` with `<span className="text-[9px] font-bold py-0.5 px-2 rounded-full border">`.
   This fixed the build immediately without bloating node_modules.
 
 ---
@@ -34,7 +32,7 @@ Here are three instances where the AI generated incomplete or incorrect code, ho
   ```bash
   The export IconPiggybank was not found in module @tabler/icons-react. Did you mean to import IconPin?
   ```
-- **What was changed**: The installed version of `@tabler/icons-react` did not export `IconPiggybank`. We changed it to `IconWallet` which is fully supported, resolving the icon compilation block.
+- **What was changed**: The project actually uses `lucide-react` rather than `@tabler/icons-react`. We removed the Tabler imports and replaced them with equivalent Lucide icons (e.g., `Wallet`, `Landmark`), resolving the icon compilation block.
 
 ---
 
